@@ -1,13 +1,13 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Alterra Ops | 3350 at Alterra</title><style>
 :root{font-family:Inter,system-ui,sans-serif;color:#e7eef9;background:#0c1422}*{box-sizing:border-box}body{margin:0}header{display:flex;justify-content:space-between;align-items:center;padding:16px 22px;background:#152238;gap:12px;flex-wrap:wrap}h1{font-size:21px;margin:0}small,.muted{color:#9caec6}.pill{background:#263d5b;border-radius:20px;padding:8px 12px;margin:3px}main{display:grid;grid-template-columns:minmax(0,1fr) 380px;height:calc(100vh - 83px)}#scene{position:relative;min-height:440px}canvas{display:block;width:100%;height:100%}aside{overflow:auto;background:#17263c;border-left:1px solid #354963;padding:15px}button,input,select,textarea{font:inherit;border-radius:7px;border:1px solid #48617f;padding:8px;background:#20344e;color:#fff}button{cursor:pointer}button:hover{background:#365579}nav{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:12px}nav button.active{background:#2466c2}article{padding:10px;margin:8px 0;border:1px solid #38506b;border-radius:9px}article:hover{border-color:#7daaf1}label{display:block;font-size:12px;color:#bdcee4;margin-top:9px}input,select,textarea{width:100%}.row{display:flex;justify-content:space-between;align-items:center;gap:8px}.row button{flex-shrink:0}.bar{height:8px;background:#34475f;border-radius:10px;overflow:hidden}.bar span{display:block;height:100%;background:#54b5df}#inspector{background:#1d314c;padding:12px;border-radius:10px;margin:12px 0}#toast{position:absolute;top:12px;left:12px;background:#273f60;padding:12px;border-radius:8px;display:none;max-width:330px}#legend{position:absolute;bottom:12px;left:12px;background:#14253bdd;padding:10px;border-radius:8px;font-size:12px}#legend span{margin-right:8px}b.dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:5px}#emergency{color:#ff8d8d;font-weight:bold}h3{margin:12px 0 6px}p{margin:6px 0}a{color:#8ebaff}#authgate{min-height:75vh;display:grid;place-items:center;padding:20px}#authform{width:min(440px,100%);padding:26px;background:#17263c;border:1px solid #354963;border-radius:14px}#authform button{margin-top:16px;width:100%}#authError{color:#ff9999}#authbar{display:flex;align-items:center;gap:12px;font-size:12px}#appmain[hidden],#authgate[hidden]{display:none!important}@media(max-width:800px){main{display:block;height:auto}#scene{height:55vh}aside{min-height:60vh}}
-</style></head><body><header><div><h1>3350 at Alterra · Operations</h1><small>3350 Toledo Terrace · Hyattsville, MD · Secure operations workspace</small></div><div><span id="today"></span><span class="pill" id="occupancy"></span><span class="pill" id="openCount"></span><span id="emergency"></span></div><div id="authbar"><span id="authstatus">Sign in to load property records</span> <button id="signout" hidden>Sign out</button></div></header><div id="authgate"><form id="authform"><h2>Alterra Ops · Staff sign in</h2><p>Authorized property team members only.</p><label>Email<input id="authEmail" type="email" autocomplete="username" required></label><label>Password<input id="authPassword" type="password" autocomplete="current-password" required></label><button type="submit">Sign in</button><p id="authError" role="alert"></p></form></div><main id="appmain" hidden><section id="scene"><div id="toast"></div><div id="legend"><span>🔵 Occupied</span><span>🟢 Ready</span><span>🟠 Turn</span><span>🔴 Emergency</span><span>🟣 Inspection</span><p>Conceptual building based on satellite references · drag to orbit · scroll to zoom · click a unit</p></div></section><aside><nav id="tabs"></nav><div id="inspector">Select a unit in the 3D building to inspect it.</div><div id="content"></div></aside></main><script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.75.0/dist/umd/supabase.min.js"></script><script>
+</style></head><body><header><div><h1>3350 at Alterra · Operations</h1><small>3350 Toledo Terrace · Hyattsville, MD · Secure operations workspace</small></div><div><span id="today"></span><span class="pill" id="occupancy"></span><span class="pill" id="openCount"></span><span id="emergency"></span></div><div id="authbar"><span id="authstatus">Sign in to load property records</span> <button id="signout" hidden>Sign out</button></div></header><div id="authgate"><form id="authform"><h2>Alterra Ops · Staff sign in</h2><p>Authorized property team members only.</p><label>Email<input id="authEmail" type="email" autocomplete="username" required></label><label>Password<input id="authPassword" type="password" autocomplete="current-password" required></label><button type="submit">Sign in</button><button type="button" id="guestBtn">Continue as guest</button><p class="muted">Guest mode uses sample records only. Changes are not saved to the property database.</p><p id="authError" role="alert"></p></form></div><main id="appmain" hidden><section id="scene"><div id="toast"></div><div id="legend"><span>🔵 Occupied</span><span>🟢 Ready</span><span>🟠 Turn</span><span>🔴 Emergency</span><span>🟣 Inspection</span><p>Conceptual building based on satellite references · drag to orbit · scroll to zoom · click a unit</p></div></section><aside><nav id="tabs"></nav><div id="inspector">Select a unit in the 3D building to inspect it.</div><div id="content"></div></aside></main><script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.75.0/dist/umd/supabase.min.js"></script><script>
 'use strict';
 const TODAY=new Date().toISOString().slice(0,10),tabs=['Work Orders','Inspections','CapEx','Turns','Leasing'];
 const $=id=>document.getElementById(id),escapeHtml=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const dateAdd=(n)=>{let d=new Date(TODAY+'T12:00:00');d.setDate(d.getDate()+n);return d.toISOString().slice(0,10)};
 function seed(){const units=Array.from({length:283},(_,i)=>({id:'A-'+String(101+i).padStart(3,'0'),building:'main',floor:Math.floor(i/71)+1,beds:i%4,baths:i%4===3?2:1,sqft:510+(i%9)*85,status:i<255?'occupied':i<263?'vacant':i<275?'turn':'maintenance',resident:null,leaseEnd:i<255?dateAdd(45+i%150):null}));const turns=Array.from({length:10},(_,i)=>({id:'TN-'+(31+i),unitId:units[263+i].id,moveOut:dateAdd(-i-2),targetReady:dateAdd(i%4+2),stage:['inspect','repairs','paint','clean'][i%4],vendor:'Demo vendor '+(i%3+1)}));const workOrders=Array.from({length:25},(_,i)=>({id:'WO-'+(1042+i),unitId:units[i===0?260:i===1?269:(i*11)%283].id,category:['plumbing','electrical','hvac','appliance','general'][i%5],priority:i<2?'emergency':i<7?'high':'normal',status:i<18?'open':i<21?'in_progress':'closed',created:dateAdd(-i%12),due:dateAdd(i%7),assignee:'Demo technician',notes:''}));const inspections=Array.from({length:6},(_,i)=>({id:'IN-'+(88+i),unitId:units[30+i*9].id,type:'annual',scheduled:dateAdd(i+1),status:'scheduled',resultNotes:''}));const capexProjects=['Roof replacement — west wing','HVAC modernization','Courtyard resurfacing','Garage lighting'].map((name,i)=>({id:'CX-'+(7+i),name,category:['roof','hvac','exterior','interior'][i],budget:[85000,52000,28000,15000][i],spent:[31200,14000,5000,12500][i],status:'active',start:dateAdd(-30),target:dateAdd(65)}));const leasing=Array.from({length:15},(_,i)=>({id:'LX-'+(512+i),date:dateAdd(-(i%14)),type:['tour','application','lease_signed','renewal','notice'][i%5],unitId:units[20+i].id,party:'Demo prospect',notes:''}));return {units,workOrders,inspections,capexProjects,turns,leasing};}
 const DB_URL='https://fyibtzoydsbzuogrdomh.supabase.co',DB_KEY='sb_publishable__myUWUb6VttU4JcZNVVnmg_sL4ghrlS',WORKSPACE='3350-alterra';
-let db,store=seed(),currentUser=null,canWrite=false,booted=false;
+let db,store=seed(),currentUser=null,canWrite=false,booted=false,guestMode=false;
 const collections=['units','workOrders','inspections','capexProjects','turns','leasing'];
 async function loadRemote(){
   const {data,error}=await db.from('alterra_records').select('collection,record_id,data').eq('workspace_id',WORKSPACE).limit(1000);
@@ -19,6 +19,7 @@ async function loadRemote(){
 }
 let pendingSave=Promise.resolve();
 function save(collection,record){
+  if(guestMode){render();recolor();toast('Guest demo: changes are temporary');return}
   if(!canWrite){toast('Read-only account');loadRemote().then(()=>{render();recolor()});return}
   render();recolor();
   pendingSave=pendingSave.then(async()=>{
@@ -30,22 +31,23 @@ async function initializeAuth(){
   if(!window.supabase){$('authError').textContent='Unable to load authentication library';return}
   db=window.supabase.createClient(DB_URL,DB_KEY,{auth:{persistSession:true,autoRefreshToken:true}});
   const {data:{session}}=await db.auth.getSession();
-  if(session)await enter(session.user);
+  if(session&&!guestMode)await enter(session.user);
   db.auth.onAuthStateChange((event,session)=>{if(event==='SIGNED_OUT')exitAuth()});
 }
 async function enter(user){
   try{
+    guestMode=false;
     const {data:member,error}=await db.from('alterra_members').select('role').eq('workspace_id',WORKSPACE).eq('user_id',user.id).maybeSingle();
     if(error)throw error;
     if(!member)throw Error('Your account is not assigned to Alterra Ops. Ask an administrator to add your account.');
-    currentUser=user;canWrite=member.role!=='viewer';
+    currentUser=user;canWrite=member.role!=='viewer';$('signout').textContent='Sign out';
     await loadRemote();
     $('authgate').hidden=true;$('appmain').hidden=false;$('signout').hidden=false;
     $('authstatus').textContent=user.email+' · '+member.role;
     if(!booted){booted=true;init3D()}render();recolor();
   }catch(err){$('authError').textContent=err.message;$('authgate').hidden=false;$('appmain').hidden=true}
 }
-function exitAuth(){currentUser=null;canWrite=false;$('authgate').hidden=false;$('appmain').hidden=true;$('signout').hidden=true;$('authstatus').textContent='Sign in to load property records'}
+function exitAuth(){guestMode=false;currentUser=null;canWrite=false;$('authgate').hidden=false;$('appmain').hidden=true;$('signout').hidden=true;$('authstatus').textContent='Sign in to load property records'}
 document.getElementById('authform').addEventListener('submit',async e=>{
   e.preventDefault();$('authError').textContent='Signing in…';
   if(!db)return $('authError').textContent='Authentication unavailable';
@@ -53,7 +55,18 @@ document.getElementById('authform').addEventListener('submit',async e=>{
   if(error)return $('authError').textContent=error.message;
   $('authError').textContent='';await enter(data.user);
 });
-$('signout').addEventListener('click',()=>db.auth.signOut());
+$('guestBtn').addEventListener('click',()=>{
+  guestMode=true;currentUser=null;canWrite=false;store=seed();
+  $('authgate').hidden=true;$('appmain').hidden=false;$('signout').hidden=false;
+  $('authstatus').textContent='Guest · sample data only';
+  $('signout').textContent='Exit guest';
+  if(!booted){booted=true;init3D()}else{recolor()}
+  render();
+});
+$('signout').addEventListener('click',()=>{
+  if(guestMode){exitAuth();$('signout').textContent='Sign out';return}
+  if(db)db.auth.signOut();
+});
 
 let tab='Work Orders',selected=null,filter='All',scene,camera,renderer,raycaster,mouse,meshes=new Map(),root,brackets,orbit={a:.8,e:.72,d:160,target:{x:0,y:0,z:0}},drag=null;
 const unit=id=>store.units.find(u=>u.id===id),openWO=id=>store.workOrders.filter(w=>w.unitId===id&&w.status!=='closed'),inspectionFlag=id=>{const x=store.inspections.filter(i=>i.unitId===id&&i.status!=='scheduled').sort((a,b)=>b.scheduled.localeCompare(a.scheduled));return x[0]?.status==='failed'},activeTurn=id=>store.turns.find(t=>t.unitId===id&&t.stage!=='ready');
