@@ -1,6 +1,6 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Alterra Ops | 3350 at Alterra</title><style>
 :root{font-family:Inter,system-ui,sans-serif;color:#e7eef9;background:#0c1422}*{box-sizing:border-box}body{margin:0}header{display:flex;justify-content:space-between;align-items:center;padding:16px 22px;background:#152238;gap:12px;flex-wrap:wrap}h1{font-size:21px;margin:0}small,.muted{color:#9caec6}.pill{background:#263d5b;border-radius:20px;padding:8px 12px;margin:3px}main{display:grid;grid-template-columns:minmax(0,1fr) 380px;height:calc(100vh - 83px)}#scene{position:relative;min-height:440px}canvas{display:block;width:100%;height:100%}aside{overflow:auto;background:#17263c;border-left:1px solid #354963;padding:15px}button,input,select,textarea{font:inherit;border-radius:7px;border:1px solid #48617f;padding:8px;background:#20344e;color:#fff}button{cursor:pointer}button:hover{background:#365579}nav{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:12px}nav button.active{background:#2466c2}article{padding:10px;margin:8px 0;border:1px solid #38506b;border-radius:9px}article:hover{border-color:#7daaf1}label{display:block;font-size:12px;color:#bdcee4;margin-top:9px}input,select,textarea{width:100%}.row{display:flex;justify-content:space-between;align-items:center;gap:8px}.row button{flex-shrink:0}.bar{height:8px;background:#34475f;border-radius:10px;overflow:hidden}.bar span{display:block;height:100%;background:#54b5df}#inspector{background:#1d314c;padding:12px;border-radius:10px;margin:12px 0}#toast{position:absolute;top:12px;left:12px;background:#273f60;padding:12px;border-radius:8px;display:none;max-width:330px}#legend{position:absolute;bottom:12px;left:12px;background:#14253bdd;padding:10px;border-radius:8px;font-size:12px}#legend span{margin-right:8px}b.dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:5px}#emergency{color:#ff8d8d;font-weight:bold}h3{margin:12px 0 6px}p{margin:6px 0}a{color:#8ebaff}#authgate{min-height:75vh;display:grid;place-items:center;padding:20px}#authform{width:min(440px,100%);padding:26px;background:#17263c;border:1px solid #354963;border-radius:14px}#authform button{margin-top:16px;width:100%}#authError{color:#ff9999}#authbar{display:flex;align-items:center;gap:12px;font-size:12px}#appmain[hidden],#authgate[hidden]{display:none!important}@media(max-width:800px){main{display:block;height:auto}#scene{height:55vh}aside{min-height:60vh}}
-</style></head><body><header><div><h1>3350 at Alterra · Operations</h1><small>3350 Toledo Terrace · Hyattsville, MD · Secure operations workspace</small></div><div><span id="today"></span><span class="pill" id="occupancy"></span><span class="pill" id="openCount"></span><span id="emergency"></span></div><div id="authbar"><span id="authstatus">Sign in to load property records</span> <button id="signout" hidden>Sign out</button></div></header><div id="authgate"><form id="authform"><h2>Alterra Ops · Staff sign in</h2><p>Authorized property team members only.</p><label>Email<input id="authEmail" type="email" autocomplete="username" required></label><label>Password<input id="authPassword" type="password" autocomplete="current-password" required></label><button type="submit">Sign in</button><p id="authError" role="alert"></p></form></div><main id="appmain" hidden><section id="scene"><div id="toast"></div><div id="legend"><span>🔵 Occupied</span><span>🟢 Ready</span><span>🟠 Turn</span><span>🔴 Emergency</span><span>🟣 Inspection</span><p>Drag to orbit · scroll to zoom · click a unit</p></div></section><aside><nav id="tabs"></nav><div id="inspector">Select a unit in the 3D building to inspect it.</div><div id="content"></div></aside></main><script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.75.0/dist/umd/supabase.min.js"></script><script>
+</style></head><body><header><div><h1>3350 at Alterra · Operations</h1><small>3350 Toledo Terrace · Hyattsville, MD · Secure operations workspace</small></div><div><span id="today"></span><span class="pill" id="occupancy"></span><span class="pill" id="openCount"></span><span id="emergency"></span></div><div id="authbar"><span id="authstatus">Sign in to load property records</span> <button id="signout" hidden>Sign out</button></div></header><div id="authgate"><form id="authform"><h2>Alterra Ops · Staff sign in</h2><p>Authorized property team members only.</p><label>Email<input id="authEmail" type="email" autocomplete="username" required></label><label>Password<input id="authPassword" type="password" autocomplete="current-password" required></label><button type="submit">Sign in</button><p id="authError" role="alert"></p></form></div><main id="appmain" hidden><section id="scene"><div id="toast"></div><div id="legend"><span>🔵 Occupied</span><span>🟢 Ready</span><span>🟠 Turn</span><span>🔴 Emergency</span><span>🟣 Inspection</span><p>Conceptual building based on satellite references · drag to orbit · scroll to zoom · click a unit</p></div></section><aside><nav id="tabs"></nav><div id="inspector">Select a unit in the 3D building to inspect it.</div><div id="content"></div></aside></main><script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.75.0/dist/umd/supabase.min.js"></script><script>
 'use strict';
 const TODAY=new Date().toISOString().slice(0,10),tabs=['Work Orders','Inspections','CapEx','Turns','Leasing'];
 const $=id=>document.getElementById(id),escapeHtml=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -55,15 +55,75 @@ document.getElementById('authform').addEventListener('submit',async e=>{
 });
 $('signout').addEventListener('click',()=>db.auth.signOut());
 
-let tab='Work Orders',selected=null,filter='All',scene,camera,renderer,raycaster,mouse,meshes=new Map(),root,brackets,orbit={a:.75,e:.62,d:155,target:{x:0,y:0,z:0}},drag=null;
+let tab='Work Orders',selected=null,filter='All',scene,camera,renderer,raycaster,mouse,meshes=new Map(),root,brackets,orbit={a:.8,e:.72,d:160,target:{x:0,y:0,z:0}},drag=null;
 const unit=id=>store.units.find(u=>u.id===id),openWO=id=>store.workOrders.filter(w=>w.unitId===id&&w.status!=='closed'),inspectionFlag=id=>{const x=store.inspections.filter(i=>i.unitId===id&&i.status!=='scheduled').sort((a,b)=>b.scheduled.localeCompare(a.scheduled));return x[0]?.status==='failed'},activeTurn=id=>store.turns.find(t=>t.unitId===id&&t.stage!=='ready');
 function color(u){if(openWO(u.id).some(w=>w.priority==='emergency'))return 0xe94f57;if(activeTurn(u.id))return 0xf2ae45;if(u.status==='vacant')return 0x41bd83;if(u.status==='maintenance')return 0x7987a2;return 0x668eb7}
 function toast(s){const t=$('toast');t.textContent=s;t.style.display='block';clearTimeout(toast.timer);toast.timer=setTimeout(()=>t.style.display='none',3500)}
-function init3D(){scene=new THREE.Scene();scene.background=new THREE.Color(0x0d1d30);camera=new THREE.OrthographicCamera(-65,65,42,-42,.1,1000);renderer=new THREE.WebGLRenderer({antialias:true});renderer.setPixelRatio(Math.min(devicePixelRatio,2));$('scene').prepend(renderer.domElement);scene.add(new THREE.HemisphereLight(0xffffff,0x243f56,2));const light=new THREE.DirectionalLight(0xffffff,1);light.position.set(50,100,40);scene.add(light);raycaster=new THREE.Raycaster();mouse=new THREE.Vector2();const ground=new THREE.Mesh(new THREE.PlaneGeometry(180,140),new THREE.MeshLambertMaterial({color:0x304355}));ground.rotation.x=-Math.PI/2;ground.position.y=-1;scene.add(ground);
-const slabMat=new THREE.MeshLambertMaterial({color:0x314a66}),poolMat=new THREE.MeshLambertMaterial({color:0x38b9d3});function block(w,h,d,x,y,z,mat){const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),mat);m.position.set(x,y,z);scene.add(m);return m}
-block(18,.3,9,57,-.6,10,poolMat);block(17,3,8,56,1,-15,slabMat);
-store.units.forEach((u,i)=>{const local=i%71,row=Math.floor(local/18),col=local%18;const x=-41+col*4.8;const z=[-25,-12,12,25][row];const y=(u.floor-1)*5+1.5;const mesh=block(4.3,3.7,7.5,x,y,z,new THREE.MeshLambertMaterial({color:color(u),transparent:true,opacity:.92}));mesh.userData.sel=u.id;meshes.set(u.id,mesh);if(inspectionFlag(u.id))mesh.material.emissive=new THREE.Color(0x49226f)});
-for(let f=0;f<4;f++){block(91,.45,62,0,f*5-.75,0,slabMat)}block(91,.5,62,0,19.8,0,slabMat);
+function init3D(){scene=new THREE.Scene();scene.background=new THREE.Color(0x0d1d30);camera=new THREE.OrthographicCamera(-65,65,42,-42,.1,1000);renderer=new THREE.WebGLRenderer({antialias:true});renderer.setPixelRatio(Math.min(devicePixelRatio,2));$('scene').prepend(renderer.domElement);scene.add(new THREE.HemisphereLight(0xffffff,0x243f56,2));const light=new THREE.DirectionalLight(0xffffff,1);light.position.set(50,100,40);scene.add(light);raycaster=new THREE.Raycaster();mouse=new THREE.Vector2();const ground=new THREE.Mesh(new THREE.PlaneGeometry(200,160),new THREE.MeshLambertMaterial({color:0x304355}));ground.rotation.x=-Math.PI/2;ground.position.y=-1;scene.add(ground);
+// Satellite-informed conceptual massing: elongated, stepped residential wings,
+// pale flat roofs, brick/glass elevations and courtyards along Toledo Terrace.
+// Apartment coordinates are schematic, not surveyed unit locations.
+const slabMat=new THREE.MeshLambertMaterial({color:0xd9dfe1}),roofMat=new THREE.MeshLambertMaterial({color:0xf0f1ec,transparent:true,opacity:.29,depthWrite:false}),brick=new THREE.MeshLambertMaterial({color:0x8c6860}),stone=new THREE.MeshLambertMaterial({color:0xc4bcb2}),glass=new THREE.MeshLambertMaterial({color:0x7292a6,transparent:true,opacity:.8}),asphalt=new THREE.MeshLambertMaterial({color:0x414a51}),walkway=new THREE.MeshLambertMaterial({color:0xb3b4ac}),grass=new THREE.MeshLambertMaterial({color:0x49644b});
+function block(w,h,d,x,y,z,mat){const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),mat);m.position.set(x,y,z);scene.add(m);return m}
+const road=block(116,.07,13,0,-.86,48,asphalt);
+block(116,.09,4,0,-.8,39,walkway);
+block(116,.08,7,0,-.85,-42,grass);
+for(let i=0;i<16;i++){
+  const x=-53+i*7.1;
+  block(3.3,.06,5,x,-.77,48,walkway);
+}
+function tree(x,z,h=5){const trunk=block(.55,h*.52,.55,x,h*.26-1,z,new THREE.MeshLambertMaterial({color:0x65513d}));const crown=new THREE.Mesh(new THREE.IcosahedronGeometry(h*.42,1),new THREE.MeshLambertMaterial({color:0x426b4a,flatShading:true}));crown.position.set(x,h*.64-1,z);scene.add(crown)}
+for(let i=0;i<13;i++){tree(-49+i*8,34,4+(i%3));tree(-49+i*8,-40,5+(i%2))}
+const wingZ=[-26,-12,12,26],wingXOffset=[0,-2,2,0];
+const windowGeo=new THREE.BoxGeometry(1.75,1.8,.09);
+const windowMat=new THREE.MeshLambertMaterial({color:0x9cb5c0,transparent:true,opacity:.84});
+const windows=new THREE.InstancedMesh(windowGeo,windowMat,283*2);
+const windowDummy=new THREE.Object3D();
+let windowIndex=0;
+store.units.forEach((u,i)=>{
+  const local=i%71,row=Math.floor(local/18),col=local%18;
+  const x=-41+col*4.8+wingXOffset[row],z=wingZ[row],y=(u.floor-1)*5+1.5;
+  const mesh=block(4.4,3.85,7.4,x,y,z,new THREE.MeshLambertMaterial({color:color(u),transparent:true,opacity:.82}));
+  mesh.userData.sel=u.id;meshes.set(u.id,mesh);
+  // Recessed glazing reads as apartment windows from either side of the block.
+  for(const side of [-1,1]){
+    windowDummy.position.set(x,y+.35,z+side*3.77);
+    windowDummy.rotation.set(0,0,0);windowDummy.scale.set(1,1,1);
+    windowDummy.updateMatrix();windows.setMatrixAt(windowIndex++,windowDummy.matrix);
+  }
+});
+windows.count=windowIndex;windows.instanceMatrix.needsUpdate=true;scene.add(windows);
+// Brick piers, glazed ends, inset courtyards and stepped flat roof planes.
+for(let f=0;f<4;f++){
+  const y=f*5-.75;
+  for(let row=0;row<4;row++){
+    const z=wingZ[row],x=wingXOffset[row]-.5;
+    block(89,.27,8.1,x,y,z,slabMat);
+    for(const col of [0,4,8,12,16,18]){
+      const px=-43+col*4.8+wingXOffset[row];
+      block(.35,4.2,.6,px,y+2.55,z+3.88,brick);
+      block(.35,4.2,.6,px,y+2.55,z-3.88,brick);
+    }
+  }
+}
+for(let row=0;row<4;row++){
+  const z=wingZ[row],x=wingXOffset[row]-.5;
+  block(90,.32,8.7,x,19.65,z,roofMat);
+  for(let k=0;k<7;k++){
+    const rx=-37+k*12+wingXOffset[row];
+    block(3.1,.24,2.4,rx,19.9,z,stone);
+    if(k%2===0)block(1.4,.65,1.2,rx+1.2,20.35,z,slabMat);
+  }
+}
+// Courtyard connectors create the irregular connected footprint visible in aerial photos.
+for(const x of [-31,1,33]){
+  block(8,19.1,31,x,8.6,0,new THREE.MeshLambertMaterial({color:0x9d8580,transparent:true,opacity:.32}));
+  block(9,.3,31,x,19.7,0,roofMat);
+}
+// Forecourt entry, pavement and planting; ornamental rather than measured.
+block(17,.18,8,0,-.65,36,walkway);
+for(const x of [-14,14])tree(x,35,4.8);
+block(9,2,3,0,.3,35,glass);
 brackets=new THREE.BoxHelper(new THREE.Mesh(new THREE.BoxGeometry(4.6,4.1,8)),0x7dc9ff);brackets.visible=false;scene.add(brackets);
 const el=renderer.domElement;el.addEventListener('pointerdown',e=>{drag={x:e.clientX,y:e.clientY,a:orbit.a,e:orbit.e,moved:false};el.setPointerCapture(e.pointerId)});el.addEventListener('pointermove',e=>{if(!drag)return;const dx=e.clientX-drag.x,dy=e.clientY-drag.y;if(Math.abs(dx)+Math.abs(dy)>5)drag.moved=true;orbit.a=drag.a-dx*.007;orbit.e=Math.max(.18,Math.min(1.35,drag.e+dy*.005))});el.addEventListener('pointerup',e=>{if(!drag?.moved)pick(e);drag=null});el.addEventListener('wheel',e=>{e.preventDefault();orbit.d=Math.max(45,Math.min(260,orbit.d+e.deltaY*.12))},{passive:false});addEventListener('resize',resize);resize();animate()}
 function resize(){const w=$('scene').clientWidth,h=$('scene').clientHeight;camera.left=-w/18;camera.right=w/18;camera.top=h/18;camera.bottom=-h/18;camera.updateProjectionMatrix();renderer.setSize(w,h)}
