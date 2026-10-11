@@ -19,7 +19,7 @@ async function loadRemote(){
 }
 let pendingSave=Promise.resolve();
 function save(collection,record){
-  if(!canWrite){toast('Read-only account');return}
+  if(!canWrite){toast('Read-only account');loadRemote().then(()=>{render();recolor()});return}
   render();recolor();
   pendingSave=pendingSave.then(async()=>{
     const {error}=await db.from('alterra_records').upsert({workspace_id:WORKSPACE,collection,record_id:record.id,data:record,updated_by:currentUser.id,updated_at:new Date().toISOString()},{onConflict:'workspace_id,collection,record_id'});
@@ -37,7 +37,7 @@ async function enter(user){
   try{
     const {data:member,error}=await db.from('alterra_members').select('role').eq('workspace_id',WORKSPACE).eq('user_id',user.id).maybeSingle();
     if(error)throw error;
-    if(!member)throw Error('Your account is not assigned to Alterra Ops.');
+    if(!member)throw Error('Your account is not assigned to Alterra Ops. Ask an administrator to add your account.');
     currentUser=user;canWrite=member.role!=='viewer';
     await loadRemote();
     $('authgate').hidden=true;$('appmain').hidden=false;$('signout').hidden=false;
@@ -81,6 +81,6 @@ if(tab==='Leasing'){out='<h3>Leasing · last 14 days</h3><p>'+occupied+' occupie
 $('content').innerHTML=out}
 function inspector(u){return '<h3>Unit '+u.id+'</h3><p>Floor '+u.floor+' · '+u.beds+' bed / '+u.baths+' bath · '+u.sqft+' sqft</p><p>Status: '+u.status+' · Lease end: '+(u.leaseEnd||'N/A')+'</p><p>Resident: '+(u.resident||'Demo / not provided')+'</p><p>Open WOs: '+openWO(u.id).map(w=>w.id+' ('+w.priority+')').join(', ')+'</p><p>Inspection: '+(inspectionFlag(u.id)?'FAILED':'No active failure')+'</p><p>Turn: '+(activeTurn(u.id)?.stage||'None')+'</p><button data-action="newwo">+ Work order for this unit</button>'}
 document.addEventListener('click',e=>{const t=e.target.closest('[data-tab],[data-unit],[data-action]');if(!t)return;if(t.dataset.tab){tab=t.dataset.tab;render()}else if(t.dataset.unit)select(t.dataset.unit);else if(t.dataset.action==='newwo'){const id=prompt('Unit ID',selected||'A-101');if(!unit(id))return toast('Unknown unit');const category=prompt('Category: plumbing, electrical, hvac, appliance, general','general');if(!['plumbing','electrical','hvac','appliance','general'].includes(category))return;const priority=prompt('Priority: emergency, high, normal, low','normal');if(!['emergency','high','normal','low'].includes(priority))return;const record={id:'WO-'+Date.now(),unitId:id,category,priority,status:'open',created:TODAY,due:dateAdd(3),assignee:'Unassigned',notes:''};store.workOrders.push(record);save('workOrders',record);select(id);if(priority==='emergency')toast('Emergency work order created: '+id)}});
-document.addEventListener('change',e=>{const t=e.target;if(t.id==='woFilter'){filter=t.value;render();return}if(t.dataset.wo){store.workOrders.find(w=>w.id===t.dataset.wo).status=t.value;save()}if(t.dataset.in){const i=store.inspections.find(x=>x.id===t.dataset.in);i.status=t.value;i.scheduled=TODAY;save('inspections',i);if(t.value==='failed')toast('Inspection failed: '+i.unitId)}if(t.dataset.turn){const x=store.turns.find(x=>x.id===t.dataset.turn);x.stage=t.value;if(t.value==='ready')unit(x.unitId).status='vacant';else unit(x.unitId).status='turn';save('turns',x);save('units',unit(x.unitId))}if(t.dataset.cx){const p=store.capexProjects.find(x=>x.id===t.dataset.cx);p.spent=Math.max(0,Number(t.value)||0);save('capexProjects',p)}});
+document.addEventListener('change',e=>{const t=e.target;if(t.id==='woFilter'){filter=t.value;render();return}if(t.dataset.wo){const w=store.workOrders.find(w=>w.id===t.dataset.wo);w.status=t.value;save('workOrders',w)}if(t.dataset.in){const i=store.inspections.find(x=>x.id===t.dataset.in);i.status=t.value;i.scheduled=TODAY;save('inspections',i);if(t.value==='failed')toast('Inspection failed: '+i.unitId)}if(t.dataset.turn){const x=store.turns.find(x=>x.id===t.dataset.turn);x.stage=t.value;if(t.value==='ready')unit(x.unitId).status='vacant';else unit(x.unitId).status='turn';save('turns',x);save('units',unit(x.unitId))}if(t.dataset.cx){const p=store.capexProjects.find(x=>x.id===t.dataset.cx);p.spent=Math.max(0,Number(t.value)||0);save('capexProjects',p)}});
 if(!window.THREE){$('authError').textContent='Unable to load 3D library.'}else{initializeAuth()}
 </script></body></html>
