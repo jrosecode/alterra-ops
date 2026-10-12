@@ -1,5 +1,44 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Alterra Ops | 3350 at Alterra</title><style>
 :root{font-family:Inter,system-ui,sans-serif;color:#e7eef9;background:#0c1422}*{box-sizing:border-box}body{margin:0}header{display:flex;justify-content:space-between;align-items:center;padding:16px 22px;background:#152238;gap:12px;flex-wrap:wrap}h1{font-size:21px;margin:0}small,.muted{color:#9caec6}.pill{background:#263d5b;border-radius:20px;padding:8px 12px;margin:3px}main{display:grid;grid-template-columns:minmax(0,1fr) 380px;height:calc(100vh - 83px)}#scene{position:relative;min-height:440px;background:#0d1d30}#modelStatus{position:absolute;top:14px;left:14px;right:14px;z-index:4;padding:10px 14px;background:#233b55;color:#fff;border-radius:8px;font-size:13px}#modelStatus[hidden]{display:none!important}canvas{display:block;width:100%;height:100%}aside{overflow:auto;background:#17263c;border-left:1px solid #354963;padding:15px}button,input,select,textarea{font:inherit;border-radius:7px;border:1px solid #48617f;padding:8px;background:#20344e;color:#fff}button{cursor:pointer}button:hover{background:#365579}nav{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:12px}nav button.active{background:#2466c2}article{padding:10px;margin:8px 0;border:1px solid #38506b;border-radius:9px}article:hover{border-color:#7daaf1}label{display:block;font-size:12px;color:#bdcee4;margin-top:9px}input,select,textarea{width:100%}.row{display:flex;justify-content:space-between;align-items:center;gap:8px}.row button{flex-shrink:0}.bar{height:8px;background:#34475f;border-radius:10px;overflow:hidden}.bar span{display:block;height:100%;background:#54b5df}#inspector{background:#1d314c;padding:12px;border-radius:10px;margin:12px 0}#toast{position:absolute;top:12px;left:12px;background:#273f60;padding:12px;border-radius:8px;display:none;max-width:330px}#legend{position:absolute;bottom:12px;left:12px;background:#14253bdd;padding:10px;border-radius:8px;font-size:12px}#legend span{margin-right:8px}b.dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:5px}#emergency{color:#ff8d8d;font-weight:bold}h3{margin:12px 0 6px}p{margin:6px 0}a{color:#8ebaff}#authgate{min-height:75vh;display:grid;place-items:center;padding:20px}#authform{width:min(440px,100%);padding:26px;background:#17263c;border:1px solid #354963;border-radius:14px}#authform button{margin-top:16px;width:100%}#authError{color:#ff9999}#authbar{display:flex;align-items:center;gap:12px;font-size:12px}#appmain[hidden],#authgate[hidden]{display:none!important}@media(max-width:800px){main{display:block;height:auto}#scene{height:55vh}aside{min-height:60vh}}
+
+/* Alterra Ops visual system — layered on top of the original interface */
+:root{--surface:#142239;--surface-raised:#1a2d47;--border:#30445f;--accent:#5d9df9;--text:#edf4ff;--muted:#a6b8d1;color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+body{background:#0b1424}
+header{position:relative;z-index:5;padding:16px clamp(16px,2.5vw,36px);background:linear-gradient(115deg,#172943,#101e34);border-bottom:1px solid var(--border);gap:12px 24px}
+header>div:first-child{min-width:230px}
+header h1{font-size:clamp(20px,2vw,26px);letter-spacing:-.035em;font-weight:750;line-height:1.2;margin-bottom:6px}
+header small{display:block;font-size:12px;line-height:1.45}
+header>div:nth-child(2){display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+#today{font-size:12px;color:var(--muted);margin-right:4px}
+.pill{font-size:12px;font-weight:650;border:1px solid #355376;background:#203b5b;margin:0;padding:8px 11px;white-space:nowrap}
+#emergency{font-size:12px;white-space:nowrap}
+#authbar{margin-left:auto;gap:9px}
+#authstatus{color:#b7c9df}
+main{height:calc(100dvh - 100px);min-height:560px;grid-template-columns:minmax(0,1fr) minmax(320px,370px);gap:0}
+#scene{min-width:0;overflow:hidden;background:radial-gradient(ellipse at 50% 40%,#1b3a58,#0a192b 72%);min-height:460px}
+#scene canvas{position:absolute;inset:0;width:100%;height:100%;touch-action:none}
+aside{border-left:1px solid #354963;background:linear-gradient(180deg,#182940,#112036);padding:18px;scrollbar-color:#405979 transparent}
+nav{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;margin-bottom:16px}
+nav button{padding:11px 8px;text-align:center;font-size:12px;font-weight:650;border-radius:9px;background:#1c304a;border:1px solid #354c69;min-width:0}
+nav button.active{background:#2563bb;border-color:#619cf2;box-shadow:0 3px 16px #1c61bd38}
+button{transition:background .15s,border-color .15s,transform .15s}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid #83b9ff;outline-offset:2px}
+article{background:#1b2d46;border-color:#344b68;padding:14px;border-radius:12px;margin:10px 0}
+#inspector{background:#203754;border:1px solid #395778;padding:15px;border-radius:12px;margin:0 0 16px;line-height:1.55}
+#content{line-height:1.55}
+#content h3{font-size:16px;letter-spacing:-.02em;margin:16px 0 10px}
+#legend{left:16px;right:16px;bottom:16px;border:1px solid #49617c;border-radius:12px;padding:12px 14px;background:#101e31ed;backdrop-filter:blur(10px);font-size:11px;line-height:1.7;pointer-events:none}
+#legend span{display:inline-block;white-space:nowrap;margin-right:11px}
+#legend p{color:#b3c7dc;margin-top:6px;font-size:11px}
+#modelStatus{right:auto;max-width:min(520px,calc(100% - 28px));box-shadow:0 8px 24px #0004}
+#authgate{min-height:calc(100dvh - 140px);background:radial-gradient(circle at 50% 20%,#1b3553,#0b1424 70%)}
+#authform{box-shadow:0 20px 70px #0005;padding:30px}
+#authform h2{font-size:23px;letter-spacing:-.03em}
+#authform button[type="submit"]{background:#2563bb;border-color:#448be5}
+@media(max-width:950px){main{grid-template-columns:minmax(0,1fr) 310px}aside{padding:12px}header{padding:14px 18px}}
+@media(max-width:800px){header{padding:15px 16px;gap:12px}header>div:nth-child(2){gap:6px}#authbar{width:100%;margin-left:0;justify-content:space-between}main{height:auto;min-height:0;display:flex;flex-direction:column}#scene{height:min(62dvh,570px);min-height:340px;flex:none}aside{border-left:0;border-top:1px solid #354963;min-height:unset;padding:16px}nav{grid-template-columns:repeat(5,minmax(0,1fr));overflow-x:auto}nav button{font-size:11px;padding:11px 5px}#legend{left:10px;right:10px;bottom:10px;padding:9px 10px}#legend span{font-size:10px;margin-right:7px}}
+@media(max-width:480px){header h1{font-size:21px}header small{font-size:11px}.pill{font-size:11px;padding:6px 9px}#scene{height:52dvh;min-height:320px}nav{grid-template-columns:repeat(3,minmax(0,1fr))}nav button{font-size:12px}#legend p{font-size:10px}}
+@media(prefers-reduced-motion:reduce){button{transition:none}}
 </style></head><body><header><div><h1>3350 at Alterra · Operations</h1><small>3350 Toledo Terrace · Hyattsville, MD · Secure operations workspace</small></div><div><span id="today"></span><span class="pill" id="occupancy"></span><span class="pill" id="openCount"></span><span id="emergency"></span></div><div id="authbar"><span id="authstatus">Sign in to load property records</span> <button id="signout" hidden>Sign out</button></div></header><div id="authgate"><form id="authform"><h2>Alterra Ops · Staff sign in</h2><p>Authorized property team members only.</p><label>Email<input id="authEmail" type="email" autocomplete="username" required></label><label>Password<input id="authPassword" type="password" autocomplete="current-password" required></label><button type="submit">Sign in</button><button type="button" id="guestBtn">Continue as guest</button><p class="muted">Guest mode uses sample records only. Changes are not saved to the property database.</p><p id="authError" role="alert"></p></form></div><main id="appmain" hidden><section id="scene"><div id="modelStatus" role="status">Loading interactive 3D building…</div><div id="toast"></div><div id="legend"><span>🔵 Occupied</span><span>🟢 Ready</span><span>🟠 Turn</span><span>🔴 Emergency</span><span>🟣 Inspection</span><p>Conceptual building based on satellite references · drag to orbit · scroll to zoom · click a unit</p></div></section><aside><nav id="tabs"></nav><div id="inspector">Select a unit in the 3D building to inspect it.</div><div id="content"></div></aside></main><script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.75.0/dist/umd/supabase.min.js"></script><script>
 'use strict';
 const TODAY=new Date().toISOString().slice(0,10),tabs=['Work Orders','Inspections','CapEx','Turns','Leasing'];
