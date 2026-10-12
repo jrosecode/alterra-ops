@@ -171,6 +171,69 @@ for(let x=-65;x<68;x+=9){
  crown.position.set(x,4.15,-18.7);scene.add(crown);
 }
 for(let x=-67;x<70;x+=6.4)arch('roof',x,-29,-.245,.12,5,.03);
+
+// Five-view architectural reference refinement: alternating light siding and
+// brick bays, recessed balcony stacks, rooftop service clusters and parking.
+const siding=new THREE.MeshLambertMaterial({color:0xd9cbb9});
+const darkerBrick=new THREE.MeshLambertMaterial({color:0x9b5344});
+const rail=new THREE.MeshLambertMaterial({color:0x444d53});
+const sidewalk=new THREE.MeshLambertMaterial({color:0xc6c1b5});
+const parkedCar=new THREE.MeshLambertMaterial({color:0x667f93});
+const carGlass=new THREE.MeshLambertMaterial({color:0x293e50});
+const foliage=new THREE.MeshLambertMaterial({color:0x54764d,flatShading:true});
+const paleRoof=new THREE.MeshLambertMaterial({color:0xe8e8e1});
+// Front and rear continuous facades, with masonry accents and lighter cladding.
+for(const [x1,x2,y1,y2] of wings){
+ const front=y1-.16,back=y2+.16;
+ for(let x=x1+3;x<x2-2;x+=8){
+  const facade=(Math.round(x/8)%3===0)?darkerBrick:siding;
+  block(3.5,16.0,.14,x,8.5,front,facade);
+  block(3.5,16.0,.14,x,8.5,back,facade);
+  // Glass balcony doors and black metal rails on alternating bays.
+  if(Math.round(x/8)%2===0){
+   for(let level=1;level<=3;level++){
+    const h=level*4.05+1;
+    for(const side of [-1,1]){
+     const zz=side<0?front-1.25:back+1.25;
+     block(3.35,.18,2.35,x,h-.95,zz,mats.stone);
+     block(3.35,1.02,.09,x,h-.28,zz+side*1.15,rail);
+     for(const dx of [-1.5,-.5,.5,1.5])block(.065,.85,.065,x+dx,h-.22,zz+side*1.18,rail);
+     block(1.6,2.35,.08,x,h+.5,side<0?front-.12:back+.12,mats.glass);
+    }
+   }
+  }
+ }
+ // Rooftop mechanical housing, vents, and varied parapet heights.
+ const cx=(x1+x2)/2,cy=(y1+y2)/2;
+ block(3.5,2.5,3.5,cx,19.3,cy,mats.parapet);
+ for(let k=0;k<4;k++)block(.55,.85,.55,cx-5+k*2.8,18.55,cy+3,mats.hvac);
+ block(x2-x1,.35,.35,cx,18.25,y1,paleRoof);
+ block(x2-x1,.35,.35,cx,18.25,y2,paleRoof);
+}
+// Distinctive landscaped entrance and pedestrian walk from Toledo Terrace.
+block(13,.13,7,0,-.14,-19,sidewalk);
+for(const x of [-11,11]){
+ block(6,.12,3,x,-.17,-17.5,mats.landscape);
+ for(let j=0;j<3;j++){
+  const shrub=new THREE.Mesh(new THREE.IcosahedronGeometry(.85,1),foliage);
+  shrub.position.set(x-2+j*2,0.8,-17.5);scene.add(shrub);
+ }
+}
+// Rear surface parking, stall lines, compact vehicles, and planting islands.
+block(142,.2,17,0,-.55,57,mats.asphalt);
+for(let x=-67;x<70;x+=5.8){
+ block(.1,.035,4.6,x,-.42,52,mats.roof);
+ if(Math.round(x*10)%4!==0){
+  const car=block(2.3,1.1,4.1,x+2.7,.22,54.5,parkedCar);
+  block(1.8,.55,2.1,x+2.7,1.04,54.5,carGlass);
+ }
+}
+for(const x of [-60,-38,-16,7,29,51]){
+ const tree=new THREE.Mesh(new THREE.IcosahedronGeometry(2.5,1),foliage);
+ tree.position.set(x,4,47);scene.add(tree);
+ block(.42,3.2,.42,x,1.1,47,mats.trunk);
+}
+
 // Preserve individual unit selection through invisible raycast targets.
 // Unit positions are schematic, not surveyed apartment locations.
 store.units.forEach((u,i)=>{
