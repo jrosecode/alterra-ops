@@ -1,0 +1,6 @@
+{
+  "name": "alterra-ops",
+  "private": true,
+  "scripts": {"test": "node tests/viewer-smoke.cjs"},
+  "devDependencies": {"three": "0.128.0"}
+}
