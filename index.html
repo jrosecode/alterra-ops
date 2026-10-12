@@ -1,45 +1,7 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Alterra Ops | 3350 at Alterra</title><style>
 :root{font-family:Inter,system-ui,sans-serif;color:#e7eef9;background:#0c1422}*{box-sizing:border-box}body{margin:0}header{display:flex;justify-content:space-between;align-items:center;padding:16px 22px;background:#152238;gap:12px;flex-wrap:wrap}h1{font-size:21px;margin:0}small,.muted{color:#9caec6}.pill{background:#263d5b;border-radius:20px;padding:8px 12px;margin:3px}main{display:grid;grid-template-columns:minmax(0,1fr) 380px;height:calc(100vh - 83px)}#scene{position:relative;min-height:440px;background:#0d1d30}#modelStatus{position:absolute;top:14px;left:14px;right:14px;z-index:4;padding:10px 14px;background:#233b55;color:#fff;border-radius:8px;font-size:13px}#modelStatus[hidden]{display:none!important}canvas{display:block;width:100%;height:100%}aside{overflow:auto;background:#17263c;border-left:1px solid #354963;padding:15px}button,input,select,textarea{font:inherit;border-radius:7px;border:1px solid #48617f;padding:8px;background:#20344e;color:#fff}button{cursor:pointer}button:hover{background:#365579}nav{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:12px}nav button.active{background:#2466c2}article{padding:10px;margin:8px 0;border:1px solid #38506b;border-radius:9px}article:hover{border-color:#7daaf1}label{display:block;font-size:12px;color:#bdcee4;margin-top:9px}input,select,textarea{width:100%}.row{display:flex;justify-content:space-between;align-items:center;gap:8px}.row button{flex-shrink:0}.bar{height:8px;background:#34475f;border-radius:10px;overflow:hidden}.bar span{display:block;height:100%;background:#54b5df}#inspector{background:#1d314c;padding:12px;border-radius:10px;margin:12px 0}#toast{position:absolute;top:12px;left:12px;background:#273f60;padding:12px;border-radius:8px;display:none;max-width:330px}#legend{position:absolute;bottom:12px;left:12px;background:#14253bdd;padding:10px;border-radius:8px;font-size:12px}#legend span{margin-right:8px}b.dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:5px}#emergency{color:#ff8d8d;font-weight:bold}h3{margin:12px 0 6px}p{margin:6px 0}a{color:#8ebaff}#authgate{min-height:75vh;display:grid;place-items:center;padding:20px}#authform{width:min(440px,100%);padding:26px;background:#17263c;border:1px solid #354963;border-radius:14px}#authform button{margin-top:16px;width:100%}#authError{color:#ff9999}#authbar{display:flex;align-items:center;gap:12px;font-size:12px}#appmain[hidden],#authgate[hidden]{display:none!important}@media(max-width:800px){main{display:block;height:auto}#scene{height:55vh}aside{min-height:60vh}}
 
-/* Alterra Ops visual system — layered on top of the original interface */
-:root{--surface:#142239;--surface-raised:#1a2d47;--border:#30445f;--accent:#5d9df9;--text:#edf4ff;--muted:#a6b8d1;color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
-body{background:#0b1424}
-header{position:relative;z-index:5;padding:16px clamp(16px,2.5vw,36px);background:linear-gradient(115deg,#172943,#101e34);border-bottom:1px solid var(--border);gap:12px 24px}
-header>div:first-child{min-width:230px}
-header h1{font-size:clamp(20px,2vw,26px);letter-spacing:-.035em;font-weight:750;line-height:1.2;margin-bottom:6px}
-header small{display:block;font-size:12px;line-height:1.45}
-header>div:nth-child(2){display:flex;align-items:center;gap:7px;flex-wrap:wrap}
-#today{font-size:12px;color:var(--muted);margin-right:4px}
-.pill{font-size:12px;font-weight:650;border:1px solid #355376;background:#203b5b;margin:0;padding:8px 11px;white-space:nowrap}
-#emergency{font-size:12px;white-space:nowrap}
-#authbar{margin-left:auto;gap:9px}
-#authstatus{color:#b7c9df}
-main{height:calc(100dvh - 100px);min-height:560px;grid-template-columns:minmax(0,1fr) minmax(320px,370px);gap:0}
-#scene{min-width:0;overflow:hidden;background:radial-gradient(ellipse at 50% 40%,#1b3a58,#0a192b 72%);min-height:460px}
-#scene canvas{position:absolute;inset:0;width:100%;height:100%;touch-action:none}
-aside{border-left:1px solid #354963;background:linear-gradient(180deg,#182940,#112036);padding:18px;scrollbar-color:#405979 transparent}
-nav{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;margin-bottom:16px}
-nav button{padding:11px 8px;text-align:center;font-size:12px;font-weight:650;border-radius:9px;background:#1c304a;border:1px solid #354c69;min-width:0}
-nav button.active{background:#2563bb;border-color:#619cf2;box-shadow:0 3px 16px #1c61bd38}
-button{transition:background .15s,border-color .15s,transform .15s}
-button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid #83b9ff;outline-offset:2px}
-article{background:#1b2d46;border-color:#344b68;padding:14px;border-radius:12px;margin:10px 0}
-#inspector{background:#203754;border:1px solid #395778;padding:15px;border-radius:12px;margin:0 0 16px;line-height:1.55}
-#content{line-height:1.55}
-#content h3{font-size:16px;letter-spacing:-.02em;margin:16px 0 10px}
-#legend{left:16px;right:16px;bottom:16px;border:1px solid #49617c;border-radius:12px;padding:12px 14px;background:#101e31ed;backdrop-filter:blur(10px);font-size:11px;line-height:1.7;pointer-events:none}
-#legend span{display:inline-block;white-space:nowrap;margin-right:11px}
-#legend p{color:#b3c7dc;margin-top:6px;font-size:11px}
-#modelStatus{right:auto;max-width:min(520px,calc(100% - 28px));box-shadow:0 8px 24px #0004}
-#authgate{min-height:calc(100dvh - 140px);background:radial-gradient(circle at 50% 20%,#1b3553,#0b1424 70%)}
-#authform{box-shadow:0 20px 70px #0005;padding:30px}
-#authform h2{font-size:23px;letter-spacing:-.03em}
-#authform button[type="submit"]{background:#2563bb;border-color:#448be5}
-@media(max-width:950px){main{grid-template-columns:minmax(0,1fr) 310px}aside{padding:12px}header{padding:14px 18px}}
-@media(max-width:800px){header{padding:15px 16px;gap:12px}header>div:nth-child(2){gap:6px}#authbar{width:100%;margin-left:0;justify-content:space-between}main{height:auto;min-height:0;display:flex;flex-direction:column}#scene{height:min(62dvh,570px);min-height:340px;flex:none}aside{border-left:0;border-top:1px solid #354963;min-height:unset;padding:16px}nav{grid-template-columns:repeat(5,minmax(0,1fr));overflow-x:auto}nav button{font-size:11px;padding:11px 5px}#legend{left:10px;right:10px;bottom:10px;padding:9px 10px}#legend span{font-size:10px;margin-right:7px}}
-@media(max-width:480px){header h1{font-size:21px}header small{font-size:11px}.pill{font-size:11px;padding:6px 9px}#scene{height:52dvh;min-height:320px}nav{grid-template-columns:repeat(3,minmax(0,1fr))}nav button{font-size:12px}#legend p{font-size:10px}}
-@media(prefers-reduced-motion:reduce){button{transition:none}}
-</style></head><body><header><div><h1>3350 at Alterra · Operations</h1><small>3350 Toledo Terrace · Hyattsville, MD · Secure operations workspace</small></div><div><span id="today"></span><span class="pill" id="occupancy"></span><span class="pill" id="openCount"></span><span id="emergency"></span></div><div id="authbar"><span id="authstatus">Sign in to load property records</span> <button id="signout" hidden>Sign out</button></div></header><div id="authgate"><form id="authform"><h2>Alterra Ops · Staff sign in</h2><p>Authorized property team members only.</p><label>Email<input id="authEmail" type="email" autocomplete="username" required></label><label>Password<input id="authPassword" type="password" autocomplete="current-password" required></label><button type="submit">Sign in</button><button type="button" id="guestBtn">Continue as guest</button><p class="muted">Guest mode uses sample records only. Changes are not saved to the property database.</p><p id="authError" role="alert"></p></form></div><main id="appmain" hidden><section id="scene"><div id="modelStatus" role="status">Loading interactive 3D building…</div><div id="toast"></div><div id="legend"><span>🔵 Occupied</span><span>🟢 Ready</span><span>🟠 Turn</span><span>🔴 Emergency</span><span>🟣 Inspection</span><p>Conceptual building based on satellite references · drag to orbit · scroll to zoom · click a unit</p></div></section><aside><nav id="tabs"></nav><div id="inspector">Select a unit in the 3D building to inspect it.</div><div id="content"></div></aside></main><script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.75.0/dist/umd/supabase.min.js"></script><script>
+#cameraViews{position:absolute;z-index:4;top:12px;right:12px;display:flex;flex-wrap:wrap;justify-content:flex-end;gap:5px;max-width:min(410px,85%)}#cameraViews button{font-size:11px;padding:7px 9px;background:#17283ee8;border:1px solid #506681}#cameraViews button:focus-visible{outline:2px solid #86baff}@media(max-width:700px){#cameraViews{top:45px;left:8px;right:8px;max-width:none;justify-content:center}#cameraViews button{padding:6px;font-size:10px}}</style></head><body><header><div><h1>3350 at Alterra · Operations</h1><small>3350 Toledo Terrace · Hyattsville, MD · Secure operations workspace</small></div><div><span id="today"></span><span class="pill" id="occupancy"></span><span class="pill" id="openCount"></span><span id="emergency"></span></div><div id="authbar"><span id="authstatus">Sign in to load property records</span> <button id="signout" hidden>Sign out</button></div></header><div id="authgate"><form id="authform"><h2>Alterra Ops · Staff sign in</h2><p>Authorized property team members only.</p><label>Email<input id="authEmail" type="email" autocomplete="username" required></label><label>Password<input id="authPassword" type="password" autocomplete="current-password" required></label><button type="submit">Sign in</button><button type="button" id="guestBtn">Continue as guest</button><p class="muted">Guest mode uses sample records only. Changes are not saved to the property database.</p><p id="authError" role="alert"></p></form></div><main id="appmain" hidden><section id="scene"><div id="cameraViews" aria-label="3D camera views"><button type="button" data-view="front">Front</button><button type="button" data-view="rear">Parking</button><button type="button" data-view="left">Dean Dr</button><button type="button" data-view="right">Right</button><button type="button" data-view="top">Roof</button></div><div id="modelStatus" role="status">Loading interactive 3D building…</div><div id="toast"></div><div id="legend"><span>🔵 Occupied</span><span>🟢 Ready</span><span>🟠 Turn</span><span>🔴 Emergency</span><span>🟣 Inspection</span><p>Conceptual building based on satellite references · drag to orbit · scroll to zoom · click a unit</p></div></section><aside><nav id="tabs"></nav><div id="inspector">Select a unit in the 3D building to inspect it.</div><div id="content"></div></aside></main><script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.75.0/dist/umd/supabase.min.js"></script><script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script><script>
 'use strict';
 const TODAY=new Date().toISOString().slice(0,10),tabs=['Work Orders','Inspections','CapEx','Turns','Leasing'];
 const $=id=>document.getElementById(id),escapeHtml=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -112,114 +74,19 @@ const unit=id=>store.units.find(u=>u.id===id),openWO=id=>store.workOrders.filter
 function color(u){if(openWO(u.id).some(w=>w.priority==='emergency'))return 0xe94f57;if(activeTurn(u.id))return 0xf2ae45;if(u.status==='vacant')return 0x41bd83;if(u.status==='maintenance')return 0x7987a2;return 0x668eb7}
 function toast(s){const t=$('toast');t.textContent=s;t.style.display='block';clearTimeout(toast.timer);toast.timer=setTimeout(()=>t.style.display='none',3500)}
 function init3D(){if(!window.THREE)throw Error('3D engine unavailable');scene=new THREE.Scene();scene.background=new THREE.Color(0x0d1d30);camera=new THREE.OrthographicCamera(-65,65,42,-42,.1,1000);renderer=new THREE.WebGLRenderer({antialias:true,powerPreference:'high-performance'});renderer.domElement.addEventListener('webglcontextlost',e=>{e.preventDefault();$('modelStatus').hidden=false;$('modelStatus').textContent='3D graphics context lost. Reload the page to restore the building.'});renderer.setPixelRatio(Math.min(devicePixelRatio,2));$('scene').prepend(renderer.domElement);scene.add(new THREE.HemisphereLight(0xffffff,0x243f56,2));const light=new THREE.DirectionalLight(0xffffff,1);light.position.set(50,100,40);scene.add(light);raycaster=new THREE.Raycaster();mouse=new THREE.Vector2();const ground=new THREE.Mesh(new THREE.PlaneGeometry(200,160),new THREE.MeshLambertMaterial({color:0x304355}));ground.rotation.x=-Math.PI/2;ground.position.y=-1;scene.add(ground);
-// Web-native recreation of the exported Alterra GLB architectural massing.
-// Same approximate wing rectangles, rooflines, facade bands and Toledo frontage.
-const mats={
- brick:new THREE.MeshLambertMaterial({color:0x8b635b}),
- parapet:new THREE.MeshLambertMaterial({color:0xcdd1cf}),
- roof:new THREE.MeshLambertMaterial({color:0xeef1ed}),
- window:new THREE.MeshLambertMaterial({color:0x5f8da4}),
- frame:new THREE.MeshLambertMaterial({color:0xd5d7d3}),
- hvac:new THREE.MeshLambertMaterial({color:0xa7afb1}),
- stone:new THREE.MeshLambertMaterial({color:0xc5bfb5}),
- glass:new THREE.MeshLambertMaterial({color:0x5393af}),
- asphalt:new THREE.MeshLambertMaterial({color:0x40474d}),
- pavement:new THREE.MeshLambertMaterial({color:0xadada8}),
- landscape:new THREE.MeshLambertMaterial({color:0x486949}),
- tree:new THREE.MeshLambertMaterial({color:0x416c48,flatShading:true}),
- trunk:new THREE.MeshLambertMaterial({color:0x634c3b})
-};
+// External glTF building asset: geometry is separate from interactive unit targets.
+const mats={brick:new THREE.MeshLambertMaterial({color:0x8b635b})};
 function block(w,h,d,x,y,z,mat){const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),mat);m.position.set(x,y,z);scene.add(m);return m}
-// Exported model coordinates are x = frontage, y = depth, z = elevation;
-// Three.js uses x = frontage, y = elevation, z = depth.
-function arch(group,x,y,z,w,d,h){return block(w,h,d,x,z,y,mats[group])}
-// Rebuilt from the supplied overhead and five-angle reference.
-// Continuous Toledo Terrace street-facing bar with three deep wings,
-// two open-to-sky recessed courts, and end returns; not ten detached blocks.
-const cream=new THREE.MeshLambertMaterial({color:0xd9c9b5});
-const redBrick=new THREE.MeshLambertMaterial({color:0x9e6153});
-const railing=new THREE.MeshLambertMaterial({color:0x414e55});
-const concrete=new THREE.MeshLambertMaterial({color:0xb7b4ac});
-const foliage=new THREE.MeshLambertMaterial({color:0x416d48,flatShading:true});
-const glass=new THREE.MeshLambertMaterial({color:0x547f97});
-const roofMetal=new THREE.MeshLambertMaterial({color:0xc5c9c8});
-function mass(x1,x2,z1,z2){const x=(x1+x2)/2,z=(z1+z2)/2;
- block(x2-x1,17.2,z2-z1,x,8.6,z,mats.brick);
- block(x2-x1+.45,.8,z2-z1+.45,x,17.55,z,mats.parapet);
- block(x2-x1-.45,.15,z2-z1-.45,x,18.01,z,mats.roof);
- // Four stories of window bays, cream stucco strips and brick pilasters.
- for(let xx=x1+2;xx<x2-1;xx+=4.4){
-  const facade=(Math.round((xx+68)/4.4)%4<2)?cream:redBrick;
-  for(const zz of [z1-.13,z2+.13]){
-   block(3.1,16.1,.15,xx,8.5,zz,facade);
-   for(let fl=0;fl<4;fl++){
-    const yy=2.35+fl*4.05;
-    block(2.15,2.5,.18,xx,yy,zz+(zz<z?-0.13:0.13),glass);
-    block(2.25,.12,.25,xx,yy+1.28,zz+(zz<z?-0.22:0.22),roofMetal);
-   }
-  }
-  if(Math.round((xx+68)/4.4)%3===0){
-   for(let fl=1;fl<=3;fl++){
-    const yy=fl*4.05+1;
-    for(const side of [-1,1]){
-     const face=side<0?z1:z2,balZ=face+side*1.05;
-     block(2.85,.17,2.2,xx,yy-.9,balZ,concrete);
-     block(2.85,.09,.1,xx,yy+.15,balZ+side*1.05,railing);
-     for(const dx of [-1.3,0,1.3])block(.07,.9,.07,xx+dx,yy-.3,balZ+side*1.05,railing);
-    }
-   }
-  }
- }
- for(let zz=z1+2;zz<z2-1;zz+=4.5)for(const xx of [x1-.1,x2+.1]){
-  for(let fl=0;fl<4;fl++)block(.19,2.5,2.1,xx,2.35+fl*4.05,zz,glass);
- }
- for(let xx=x1+5;xx<x2-3;xx+=9){
-  block(2.4,.65,1.8,xx,18.42,z,mats.hvac);
-  block(.35,.9,.35,xx+2.5,18.55,z+2,roofMetal);
- }
-}
-// Single connected frontage, stepped street wall and two recessed courts.
-mass(-67,67,-10,6);
-mass(-67,-48,6,48);
-mass(-18,17,6,47);
-mass(48,67,6,48);
-mass(-48,-18,34,48);
-mass(17,48,34,48);
-// Narrow connectors keep the property physically continuous behind the courts.
-mass(-48,-43,28,35);
-mass(43,48,28,35);
-// Main entry in central frontage with glazed doors and canopy.
-block(12,7,.28,0,3.5,-10.26,cream);
-block(7,5.7,.35,0,3,-10.48,glass);
-block(12,.35,4,0,5.4,-12.2,concrete);
-// Toledo Terrace street, sidewalk and green verge.
-block(154,.2,15,0,-.48,-28,mats.asphalt);
-block(154,.14,4,0,-.33,-18,concrete);
-block(154,.12,4,0,-.3,-14,mats.landscape);
-// Parking behind the property, with visible spaces and vehicles.
-block(154,.2,19,0,-.49,60,mats.asphalt);
-for(let xx=-70;xx<71;xx+=5.7){
- block(.1,.025,5,xx,-.36,56,mats.roof);
- if(Math.round(xx)%3!==0){
-  block(2.25,1,3.8,xx+2.7,.22,59,mats.hvac);
-  block(1.7,.5,2,xx+2.7,.98,59,glass);
- }
-}
-// Courtyard paving and planting, with foliage kept below facade sight lines.
-for(const [x1,x2] of [[-46,-20],[19,46]]){
- const mid=(x1+x2)/2;
- block(x2-x1-.6,.12,22,mid,-.28,20,concrete);
- for(const xx of [x1+5,x2-5]){
-  const tree=new THREE.Mesh(new THREE.IcosahedronGeometry(2.1,1),foliage);
-  tree.position.set(xx,3.8,20);scene.add(tree);
-  block(.38,2.8,.38,xx,1.1,20,mats.trunk);
- }
-}
-for(let xx=-64;xx<67;xx+=11){
- const crown=new THREE.Mesh(new THREE.IcosahedronGeometry(2.3,1),foliage);
- crown.position.set(xx,4,-17);scene.add(crown);
- block(.38,3,.38,xx,1.2,-17,mats.trunk);
-}
+if(!THREE.GLTFLoader)throw Error('3D model loader unavailable');
+const loader=new THREE.GLTFLoader();
+loader.load('./assets/alterra-building.gltf',gltf=>{
+ scene.add(gltf.scene);
+ const status=$('modelStatus');status.hidden=true;
+},undefined,err=>{
+ const status=$('modelStatus');status.hidden=false;
+ status.textContent='Building model failed to load. Please reload the page.';
+ console.error('Alterra glTF load error',err);
+});
 // Preserve individual unit selection through invisible raycast targets.
 // Unit positions are schematic, not surveyed apartment locations.
 store.units.forEach((u,i)=>{
@@ -229,7 +96,7 @@ store.units.forEach((u,i)=>{
  mesh.userData.sel=u.id;meshes.set(u.id,mesh);
 });
 brackets=new THREE.BoxHelper(new THREE.Mesh(new THREE.BoxGeometry(4.6,4.1,8)),0x7dc9ff);brackets.visible=false;scene.add(brackets);
-const el=renderer.domElement;el.addEventListener('pointerdown',e=>{drag={x:e.clientX,y:e.clientY,a:orbit.a,e:orbit.e,moved:false};el.setPointerCapture(e.pointerId)});el.addEventListener('pointermove',e=>{if(!drag)return;const dx=e.clientX-drag.x,dy=e.clientY-drag.y;if(Math.abs(dx)+Math.abs(dy)>5)drag.moved=true;orbit.a=drag.a-dx*.007;orbit.e=Math.max(.18,Math.min(1.35,drag.e+dy*.005))});el.addEventListener('pointerup',e=>{if(!drag?.moved)pick(e);drag=null});el.addEventListener('wheel',e=>{e.preventDefault();orbit.d=Math.max(45,Math.min(260,orbit.d+e.deltaY*.12))},{passive:false});addEventListener('resize',resize);resize();animate();setTimeout(resize,80);$('modelStatus').hidden=true}
+const viewAngles={front:{a:-Math.PI/2,e:.4,d:190},rear:{a:Math.PI/2,e:.4,d:190},left:{a:Math.PI,e:.5,d:190},right:{a:0,e:.5,d:190},top:{a:-Math.PI/2,e:1.52,d:175}};$('cameraViews').addEventListener('click',event=>{const view=event.target.closest('[data-view]');if(!view)return;Object.assign(orbit,viewAngles[view.dataset.view]);});const el=renderer.domElement;el.addEventListener('pointerdown',e=>{drag={x:e.clientX,y:e.clientY,a:orbit.a,e:orbit.e,moved:false};el.setPointerCapture(e.pointerId)});el.addEventListener('pointermove',e=>{if(!drag)return;const dx=e.clientX-drag.x,dy=e.clientY-drag.y;if(Math.abs(dx)+Math.abs(dy)>5)drag.moved=true;orbit.a=drag.a-dx*.007;orbit.e=Math.max(.18,Math.min(1.35,drag.e+dy*.005))});el.addEventListener('pointerup',e=>{if(!drag?.moved)pick(e);drag=null});el.addEventListener('wheel',e=>{e.preventDefault();orbit.d=Math.max(45,Math.min(260,orbit.d+e.deltaY*.12))},{passive:false});addEventListener('resize',resize);resize();animate();setTimeout(resize,80);}
 function resize(){const w=Math.max(320,$('scene').clientWidth),h=Math.max(360,$('scene').clientHeight);const scale=Math.max(w/155,h/110);camera.left=-w/(2*scale);camera.right=w/(2*scale);camera.top=h/(2*scale);camera.bottom=-h/(2*scale);camera.updateProjectionMatrix();renderer.setSize(w,h)}
 function animate(){requestAnimationFrame(animate);const {a,e,d,target}=orbit;camera.position.set(target.x+Math.cos(a)*Math.cos(e)*d,target.y+Math.sin(e)*d,target.z+Math.sin(a)*Math.cos(e)*d);camera.lookAt(target.x,target.y,target.z);renderer.render(scene,camera)}
 function pick(e){const rect=renderer.domElement.getBoundingClientRect();mouse.set((e.clientX-rect.left)/rect.width*2-1,-(e.clientY-rect.top)/rect.height*2+1);raycaster.setFromCamera(mouse,camera);const hits=raycaster.intersectObjects([...meshes.values()]);if(hits.length)select(hits[0].object.userData.sel)}
