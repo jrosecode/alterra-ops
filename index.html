@@ -102,9 +102,9 @@ const outlineShape=new THREE.Shape();
 footprint.forEach((p,i)=>i?outlineShape.lineTo(p.x,p.y):outlineShape.moveTo(p.x,p.y));
 outlineShape.closePath();
 const shell=new THREE.Mesh(new THREE.ExtrudeGeometry(outlineShape,{depth:wallHeight,bevelEnabled:false,steps:1,curveSegments:1}),[roofMat,wallMat]);
-shell.rotation.x=-Math.PI/2;scene.add(shell);
+shell.rotation.x=Math.PI/2;shell.position.y=wallHeight;scene.add(shell);
 const roof=new THREE.Mesh(new THREE.ShapeGeometry(outlineShape),roofMat);
-roof.rotation.x=-Math.PI/2;roof.position.y=wallHeight+.035;scene.add(roof);
+roof.rotation.x=Math.PI/2;roof.position.y=wallHeight+.035;scene.add(roof);
 // The parapet follows the exact roof outline; avoids floating roof triangles.
 for(let i=0;i<footprint.length;i++){
  const p=footprint[i],q=footprint[(i+1)%footprint.length],dx=q.x-p.x,dz=q.y-p.y;
