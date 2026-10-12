@@ -133,112 +133,98 @@ function block(w,h,d,x,y,z,mat){const m=new THREE.Mesh(new THREE.BoxGeometry(w,h
 // Exported model coordinates are x = frontage, y = depth, z = elevation;
 // Three.js uses x = frontage, y = elevation, z = depth.
 function arch(group,x,y,z,w,d,h){return block(w,h,d,x,z,y,mats[group])}
-const wings=[
- [-63,-42,-10,17],[-41,-16,-10,17],[-15,13,-10,17],
- [14,42,-10,17],[43,64,-10,17],
- [-62,-45,17,45],[-36,-18,17,39],[-9,10,17,42],
- [19,39,17,42],[47,63,17,46]
-];
-for(const [x1,x2,y1,y2] of wings){
- const cx=(x1+x2)/2,cy=(y1+y2)/2;
- arch('brick',cx,cy,8.6,x2-x1,y2-y1,17.2);
- arch('parapet',cx,cy,17.55,x2-x1+.55,y2-y1+.55,.8);
- arch('roof',cx,cy,17.97,x2-x1-.5,y2-y1-.5,.17);
- for(let floor=0;floor<4;floor++){
-  const z=2.4+floor*4.05;
-  for(let x=x1+2.1;x<x2-1.2;x+=4){
-   arch('window',x,y1-.08,z,2.05,.18,2.65);
-   arch('window',x,y2+.08,z,2.05,.18,2.65);
-   arch('frame',x,y1-.21,z,.13,.13,2.85);
-   arch('frame',x,y2+.21,z,.13,.13,2.85);
+// Rebuilt from the supplied overhead and five-angle reference.
+// Continuous Toledo Terrace street-facing bar with three deep wings,
+// two open-to-sky recessed courts, and end returns; not ten detached blocks.
+const cream=new THREE.MeshLambertMaterial({color:0xd9c9b5});
+const redBrick=new THREE.MeshLambertMaterial({color:0x9e6153});
+const railing=new THREE.MeshLambertMaterial({color:0x414e55});
+const concrete=new THREE.MeshLambertMaterial({color:0xb7b4ac});
+const foliage=new THREE.MeshLambertMaterial({color:0x416d48,flatShading:true});
+const glass=new THREE.MeshLambertMaterial({color:0x547f97});
+const roofMetal=new THREE.MeshLambertMaterial({color:0xc5c9c8});
+function mass(x1,x2,z1,z2){const x=(x1+x2)/2,z=(z1+z2)/2;
+ block(x2-x1,17.2,z2-z1,x,8.6,z,mats.brick);
+ block(x2-x1+.45,.8,z2-z1+.45,x,17.55,z,mats.parapet);
+ block(x2-x1-.45,.15,z2-z1-.45,x,18.01,z,mats.roof);
+ // Four stories of window bays, cream stucco strips and brick pilasters.
+ for(let xx=x1+2;xx<x2-1;xx+=4.4){
+  const facade=(Math.round((xx+68)/4.4)%4<2)?cream:redBrick;
+  for(const zz of [z1-.13,z2+.13]){
+   block(3.1,16.1,.15,xx,8.5,zz,facade);
+   for(let fl=0;fl<4;fl++){
+    const yy=2.35+fl*4.05;
+    block(2.15,2.5,.18,xx,yy,zz+(zz<z?-0.13:0.13),glass);
+    block(2.25,.12,.25,xx,yy+1.28,zz+(zz<z?-0.22:0.22),roofMetal);
+   }
   }
-  for(let y=y1+2;y<y2-1;y+=4.4){
-   arch('window',x1-.08,y,z,.18,2.05,2.6);
-   arch('window',x2+.08,y,z,.18,2.05,2.6);
-  }
- }
- for(let x=x1+5;x<x2-3;x+=10)arch('hvac',x,cy,18.35,2.7,2,.65);
-}
-arch('stone',0,-12,4,13,3,8);
-arch('glass',0,-13.65,3.4,8,.18,6.2);
-arch('parapet',0,-16.3,5.8,12,6,.4);
-arch('asphalt',0,-27,-.42,150,14,.3);
-arch('pavement',0,-17.6,-.23,150,4,.15);
-arch('landscape',0,49,-.42,150,11,.2);
-for(let x=-65;x<68;x+=9){
- arch('trunk',x,-18.7,1.5,.42,.42,3);
- const crown=new THREE.Mesh(new THREE.IcosahedronGeometry(2.15,1),mats.tree);
- crown.position.set(x,4.15,-18.7);scene.add(crown);
-}
-for(let x=-67;x<70;x+=6.4)arch('roof',x,-29,-.245,.12,5,.03);
-
-// Five-view architectural reference refinement: alternating light siding and
-// brick bays, recessed balcony stacks, rooftop service clusters and parking.
-const siding=new THREE.MeshLambertMaterial({color:0xd9cbb9});
-const darkerBrick=new THREE.MeshLambertMaterial({color:0x9b5344});
-const rail=new THREE.MeshLambertMaterial({color:0x444d53});
-const sidewalk=new THREE.MeshLambertMaterial({color:0xc6c1b5});
-const parkedCar=new THREE.MeshLambertMaterial({color:0x667f93});
-const carGlass=new THREE.MeshLambertMaterial({color:0x293e50});
-const foliage=new THREE.MeshLambertMaterial({color:0x54764d,flatShading:true});
-const paleRoof=new THREE.MeshLambertMaterial({color:0xe8e8e1});
-// Front and rear continuous facades, with masonry accents and lighter cladding.
-for(const [x1,x2,y1,y2] of wings){
- const front=y1-.16,back=y2+.16;
- for(let x=x1+3;x<x2-2;x+=8){
-  const facade=(Math.round(x/8)%3===0)?darkerBrick:siding;
-  block(3.5,16.0,.14,x,8.5,front,facade);
-  block(3.5,16.0,.14,x,8.5,back,facade);
-  // Glass balcony doors and black metal rails on alternating bays.
-  if(Math.round(x/8)%2===0){
-   for(let level=1;level<=3;level++){
-    const h=level*4.05+1;
+  if(Math.round((xx+68)/4.4)%3===0){
+   for(let fl=1;fl<=3;fl++){
+    const yy=fl*4.05+1;
     for(const side of [-1,1]){
-     const zz=side<0?front-1.25:back+1.25;
-     block(3.35,.18,2.35,x,h-.95,zz,mats.stone);
-     block(3.35,1.02,.09,x,h-.28,zz+side*1.15,rail);
-     for(const dx of [-1.5,-.5,.5,1.5])block(.065,.85,.065,x+dx,h-.22,zz+side*1.18,rail);
-     block(1.6,2.35,.08,x,h+.5,side<0?front-.12:back+.12,mats.glass);
+     const face=side<0?z1:z2,balZ=face+side*1.05;
+     block(2.85,.17,2.2,xx,yy-.9,balZ,concrete);
+     block(2.85,.09,.1,xx,yy+.15,balZ+side*1.05,railing);
+     for(const dx of [-1.3,0,1.3])block(.07,.9,.07,xx+dx,yy-.3,balZ+side*1.05,railing);
     }
    }
   }
  }
- // Rooftop mechanical housing, vents, and varied parapet heights.
- const cx=(x1+x2)/2,cy=(y1+y2)/2;
- block(3.5,2.5,3.5,cx,19.3,cy,mats.parapet);
- for(let k=0;k<4;k++)block(.55,.85,.55,cx-5+k*2.8,18.55,cy+3,mats.hvac);
- block(x2-x1,.35,.35,cx,18.25,y1,paleRoof);
- block(x2-x1,.35,.35,cx,18.25,y2,paleRoof);
-}
-// Distinctive landscaped entrance and pedestrian walk from Toledo Terrace.
-block(13,.13,7,0,-.14,-19,sidewalk);
-for(const x of [-11,11]){
- block(6,.12,3,x,-.17,-17.5,mats.landscape);
- for(let j=0;j<3;j++){
-  const shrub=new THREE.Mesh(new THREE.IcosahedronGeometry(.85,1),foliage);
-  shrub.position.set(x-2+j*2,0.8,-17.5);scene.add(shrub);
+ for(let zz=z1+2;zz<z2-1;zz+=4.5)for(const xx of [x1-.1,x2+.1]){
+  for(let fl=0;fl<4;fl++)block(.19,2.5,2.1,xx,2.35+fl*4.05,zz,glass);
+ }
+ for(let xx=x1+5;xx<x2-3;xx+=9){
+  block(2.4,.65,1.8,xx,18.42,z,mats.hvac);
+  block(.35,.9,.35,xx+2.5,18.55,z+2,roofMetal);
  }
 }
-// Rear surface parking, stall lines, compact vehicles, and planting islands.
-block(142,.2,17,0,-.55,57,mats.asphalt);
-for(let x=-67;x<70;x+=5.8){
- block(.1,.035,4.6,x,-.42,52,mats.roof);
- if(Math.round(x*10)%4!==0){
-  const car=block(2.3,1.1,4.1,x+2.7,.22,54.5,parkedCar);
-  block(1.8,.55,2.1,x+2.7,1.04,54.5,carGlass);
+// Single connected frontage, stepped street wall and two recessed courts.
+mass(-67,67,-10,6);
+mass(-67,-48,6,48);
+mass(-18,17,6,47);
+mass(48,67,6,48);
+mass(-48,-18,34,48);
+mass(17,48,34,48);
+// Narrow connectors keep the property physically continuous behind the courts.
+mass(-48,-43,28,35);
+mass(43,48,28,35);
+// Main entry in central frontage with glazed doors and canopy.
+block(12,7,.28,0,3.5,-10.26,cream);
+block(7,5.7,.35,0,3,-10.48,glass);
+block(12,.35,4,0,5.4,-12.2,concrete);
+// Toledo Terrace street, sidewalk and green verge.
+block(154,.2,15,0,-.48,-28,mats.asphalt);
+block(154,.14,4,0,-.33,-18,concrete);
+block(154,.12,4,0,-.3,-14,mats.landscape);
+// Parking behind the property, with visible spaces and vehicles.
+block(154,.2,19,0,-.49,60,mats.asphalt);
+for(let xx=-70;xx<71;xx+=5.7){
+ block(.1,.025,5,xx,-.36,56,mats.roof);
+ if(Math.round(xx)%3!==0){
+  block(2.25,1,3.8,xx+2.7,.22,59,mats.hvac);
+  block(1.7,.5,2,xx+2.7,.98,59,glass);
  }
 }
-for(const x of [-60,-38,-16,7,29,51]){
- const tree=new THREE.Mesh(new THREE.IcosahedronGeometry(2.5,1),foliage);
- tree.position.set(x,4,47);scene.add(tree);
- block(.42,3.2,.42,x,1.1,47,mats.trunk);
+// Courtyard paving and planting, with foliage kept below facade sight lines.
+for(const [x1,x2] of [[-46,-20],[19,46]]){
+ const mid=(x1+x2)/2;
+ block(x2-x1-.6,.12,22,mid,-.28,20,concrete);
+ for(const xx of [x1+5,x2-5]){
+  const tree=new THREE.Mesh(new THREE.IcosahedronGeometry(2.1,1),foliage);
+  tree.position.set(xx,3.8,20);scene.add(tree);
+  block(.38,2.8,.38,xx,1.1,20,mats.trunk);
+ }
 }
-
+for(let xx=-64;xx<67;xx+=11){
+ const crown=new THREE.Mesh(new THREE.IcosahedronGeometry(2.3,1),foliage);
+ crown.position.set(xx,4,-17);scene.add(crown);
+ block(.38,3,.38,xx,1.2,-17,mats.trunk);
+}
 // Preserve individual unit selection through invisible raycast targets.
 // Unit positions are schematic, not surveyed apartment locations.
 store.units.forEach((u,i)=>{
  const local=i%71,row=Math.floor(local/18),col=local%18;
- const x=-60+col*7.2,z=[-8,8,25,40][row],y=(u.floor-1)*4.05+2.3;
+ const x=-62+col*7.25,z=[-8,4,36,45][row],y=(u.floor-1)*4.05+2.3;
  const mesh=block(6.9,3.8,6.4,x,y,z,new THREE.MeshBasicMaterial({color:color(u),transparent:true,opacity:0,depthWrite:false}));
  mesh.userData.sel=u.id;meshes.set(u.id,mesh);
 });
