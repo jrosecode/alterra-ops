@@ -1,7 +1,7 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Alterra Ops | 3350 at Alterra</title><style>
 :root{font-family:Inter,system-ui,sans-serif;color:#e7eef9;background:#0c1422}*{box-sizing:border-box}body{margin:0}header{display:flex;justify-content:space-between;align-items:center;padding:16px 22px;background:#152238;gap:12px;flex-wrap:wrap}h1{font-size:21px;margin:0}small,.muted{color:#9caec6}.pill{background:#263d5b;border-radius:20px;padding:8px 12px;margin:3px}main{display:grid;grid-template-columns:minmax(0,1fr) 380px;height:calc(100vh - 83px)}#scene{position:relative;min-height:440px;background:#0d1d30}#modelStatus{position:absolute;top:14px;left:14px;right:14px;z-index:4;padding:10px 14px;background:#233b55;color:#fff;border-radius:8px;font-size:13px}#modelStatus[hidden]{display:none!important}canvas{display:block;width:100%;height:100%}aside{overflow:auto;background:#17263c;border-left:1px solid #354963;padding:15px}button,input,select,textarea{font:inherit;border-radius:7px;border:1px solid #48617f;padding:8px;background:#20344e;color:#fff}button{cursor:pointer}button:hover{background:#365579}nav{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:12px}nav button.active{background:#2466c2}article{padding:10px;margin:8px 0;border:1px solid #38506b;border-radius:9px}article:hover{border-color:#7daaf1}label{display:block;font-size:12px;color:#bdcee4;margin-top:9px}input,select,textarea{width:100%}.row{display:flex;justify-content:space-between;align-items:center;gap:8px}.row button{flex-shrink:0}.bar{height:8px;background:#34475f;border-radius:10px;overflow:hidden}.bar span{display:block;height:100%;background:#54b5df}#inspector{background:#1d314c;padding:12px;border-radius:10px;margin:12px 0}#toast{position:absolute;top:12px;left:12px;background:#273f60;padding:12px;border-radius:8px;display:none;max-width:330px}#legend{position:absolute;bottom:12px;left:12px;background:#14253bdd;padding:10px;border-radius:8px;font-size:12px}#legend span{margin-right:8px}b.dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:5px}#emergency{color:#ff8d8d;font-weight:bold}h3{margin:12px 0 6px}p{margin:6px 0}a{color:#8ebaff}#authgate{min-height:75vh;display:grid;place-items:center;padding:20px}#authform{width:min(440px,100%);padding:26px;background:#17263c;border:1px solid #354963;border-radius:14px}#authform button{margin-top:16px;width:100%}#authError{color:#ff9999}#authbar{display:flex;align-items:center;gap:12px;font-size:12px}#appmain[hidden],#authgate[hidden]{display:none!important}@media(max-width:800px){main{display:block;height:auto}#scene{height:55vh}aside{min-height:60vh}}
 
-#cameraViews{position:absolute;z-index:4;top:12px;right:12px;display:flex;flex-wrap:wrap;justify-content:flex-end;gap:5px;max-width:min(410px,85%)}#cameraViews button{font-size:11px;padding:7px 9px;background:#17283ee8;border:1px solid #506681}#cameraViews button:focus-visible{outline:2px solid #86baff}@media(max-width:700px){#cameraViews{top:45px;left:8px;right:8px;max-width:none;justify-content:center}#cameraViews button{padding:6px;font-size:10px}}canvas{touch-action:none}#legend{max-width:calc(100% - 24px)}#toast{z-index:5}button:focus-visible,select:focus-visible{outline:2px solid #86baff;outline-offset:2px}</style></head><body><header><div><h1>3350 at Alterra · Operations</h1><small>3350 Toledo Terrace · Hyattsville, MD · Secure operations workspace</small></div><div><span id="today"></span><span class="pill" id="occupancy"></span><span class="pill" id="openCount"></span><span id="emergency"></span></div><div id="authbar"><span id="authstatus">Sign in to load property records</span> <button id="signout" hidden>Sign out</button></div></header><div id="authgate"><form id="authform"><h2>Alterra Ops · Staff sign in</h2><p>Authorized property team members only.</p><label>Email<input id="authEmail" type="email" autocomplete="username" required></label><label>Password<input id="authPassword" type="password" autocomplete="current-password" required></label><button type="submit">Sign in</button><button type="button" id="guestBtn">Continue as guest</button><p class="muted">Guest mode uses sample records only. Changes are not saved to the property database.</p><p id="authError" role="alert"></p></form></div><main id="appmain" hidden><section id="scene"><div id="cameraViews" aria-label="3D camera views"><button type="button" data-view="front">Front</button><button type="button" data-view="rear">Parking</button><button type="button" data-view="left">Dean Dr</button><button type="button" data-view="right">Right</button><button type="button" data-view="top">Roof</button></div><div id="modelStatus" role="status">Loading interactive 3D building…</div><div id="toast"></div><div id="legend"><span>🔵 Occupied</span><span>🟢 Ready</span><span>🟠 Turn</span><span>🔴 Emergency</span><span>🟣 Inspection</span><p>Conceptual model · unit locations are schematic · drag to orbit · scroll to zoom</p></div></section><aside><nav id="tabs"></nav><div id="inspector">Select a unit in the 3D building to inspect it.</div><div id="content"></div></aside></main><script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.75.0/dist/umd/supabase.min.js"></script><script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script><script>
+#cameraViews{position:absolute;z-index:4;top:12px;right:12px;display:flex;flex-wrap:wrap;justify-content:flex-end;gap:5px;max-width:min(410px,85%)}#cameraViews button{font-size:11px;padding:7px 9px;background:#17283ee8;border:1px solid #506681}#cameraViews button:focus-visible{outline:2px solid #86baff}@media(max-width:700px){#cameraViews{top:45px;left:8px;right:8px;max-width:none;justify-content:center}#cameraViews button{padding:6px;font-size:10px}}canvas{touch-action:none}#legend{max-width:calc(100% - 24px)}#toast{z-index:5}button:focus-visible,select:focus-visible{outline:2px solid #86baff;outline-offset:2px}</style><link rel="stylesheet" href="dashboard.css"></head><body><header><div><h1>3350 at Alterra · Operations</h1><small>3350 Toledo Terrace · Hyattsville, MD · Secure operations workspace</small></div><div><span id="today"></span><span class="pill" id="occupancy"></span><span class="pill" id="openCount"></span><span id="emergency"></span></div><div id="authbar"><span id="authstatus">Sign in to load property records</span> <button id="signout" hidden>Sign out</button></div></header><div id="authgate"><form id="authform"><h2>Alterra Ops · Staff sign in</h2><p>Authorized property team members only.</p><label>Email<input id="authEmail" type="email" autocomplete="username" required></label><label>Password<input id="authPassword" type="password" autocomplete="current-password" required></label><button type="submit">Sign in</button><button type="button" id="guestBtn">Continue as guest</button><p class="muted">Guest mode uses sample records only. Changes are not saved to the property database.</p><p id="authError" role="alert"></p></form></div><main id="appmain" hidden><section id="scene"><img id="modelPreview" src="assets/previews/left.jpg" alt="Conceptual model" hidden><div id="viewerMode">PROPERTY MODEL</div><div id="cameraViews" aria-label="3D camera views"><button type="button" data-view="front">Front</button><button type="button" data-view="rear">Parking</button><button type="button" data-view="left">Dean Dr</button><button type="button" data-view="right">Opposite</button><button type="button" data-view="top">Roof</button></div><div id="modelStatus" role="status">Loading interactive 3D building…</div><div id="viewerTools"><button id="zoomIn" aria-label="Zoom in">+</button><button id="zoomOut" aria-label="Zoom out">−</button><button id="resetView">Reset</button><button id="overlayToggle" aria-pressed="false">Unit overlay</button></div><div id="toast" role="status"></div><div id="legend"><span>🔵 Occupied</span><span>🟢 Ready</span><span>🟠 Turn</span><span>🔴 Emergency</span><span>🟣 Inspection</span><p><span id="viewerHint">Drag to orbit · scroll or pinch to zoom · select a unit</span></p></div></section><aside><div class="panel-heading"><small>PROPERTY OPERATIONS</small><h2>Overview</h2><span>283 apartments · 4 floors</span></div><label for="unitSelect">Find an apartment</label><select id="unitSelect"><option value="">Select unit…</option></select><nav id="tabs"></nav><div id="inspector">Select a unit in the 3D building to inspect it.</div><div id="content"></div></aside></main><script src="vendor/three.min.js"></script><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.75.0/dist/umd/supabase.min.js"></script><script src="vendor/GLTFLoader.js"></script><script>
 'use strict';
 const TODAY=new Date().toISOString().slice(0,10),tabs=['Work Orders','Inspections','CapEx','Turns','Leasing'];
 const $=id=>document.getElementById(id),escapeHtml=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -45,7 +45,7 @@ async function enter(user){
     await loadRemote();
     $('authgate').hidden=true;$('appmain').hidden=false;$('signout').hidden=false;
     $('authstatus').textContent=user.email+' · '+member.role;
-    try{if(!booted){init3D();booted=true}else{resize()}$('modelStatus').hidden=true}catch(err){$('modelStatus').hidden=false;$('modelStatus').textContent='3D model error: '+err.message;console.error('Alterra 3D initialization failed',err)}render();recolor();
+    try{if(!booted){await init3D();booted=true}else{resize()}}catch(err){$('modelStatus').hidden=false;$('modelStatus').textContent='3D model error: '+err.message;console.error('Alterra 3D initialization failed',err)}render();recolor();
   }catch(err){$('authError').textContent=err.message;$('authgate').hidden=false;$('appmain').hidden=true}
 }
 function exitAuth(){guestMode=false;currentUser=null;canWrite=false;$('authgate').hidden=false;$('appmain').hidden=true;$('signout').hidden=true;$('authstatus').textContent='Sign in to load property records'}
@@ -56,12 +56,12 @@ document.getElementById('authform').addEventListener('submit',async e=>{
   if(error)return $('authError').textContent=error.message;
   $('authError').textContent='';await enter(data.user);
 });
-$('guestBtn').addEventListener('click',()=>{
+$('guestBtn').addEventListener('click',async()=>{
   guestMode=true;currentUser=null;canWrite=false;store=seed();
   $('authgate').hidden=true;$('appmain').hidden=false;$('signout').hidden=false;
   $('authstatus').textContent='Guest · sample data only';
   $('signout').textContent='Exit guest';
-  try{if(!booted){init3D();booted=true}else{resize();recolor()}$('modelStatus').hidden=true}catch(err){$('modelStatus').hidden=false;$('modelStatus').textContent='3D model error: '+err.message;console.error('Alterra guest 3D initialization failed',err)}
+  try{if(!booted){await init3D();booted=true}else{resize();recolor()}}catch(err){$('modelStatus').hidden=false;$('modelStatus').textContent='3D model error: '+err.message;console.error('Alterra guest 3D initialization failed',err)}
   render();
 });
 $('signout').addEventListener('click',()=>{
@@ -73,108 +73,6 @@ let tab='Work Orders',selected=null,filter='All',scene,camera,renderer,raycaster
 const unit=id=>store.units.find(u=>u.id===id),openWO=id=>store.workOrders.filter(w=>w.unitId===id&&w.status!=='closed'),inspectionFlag=id=>{const x=store.inspections.filter(i=>i.unitId===id&&i.status!=='scheduled').sort((a,b)=>b.scheduled.localeCompare(a.scheduled));return x[0]?.status==='failed'},activeTurn=id=>store.turns.find(t=>t.unitId===id&&t.stage!=='ready');
 function color(u){if(openWO(u.id).some(w=>w.priority==='emergency'))return 0xe94f57;if(activeTurn(u.id))return 0xf2ae45;if(u.status==='vacant')return 0x41bd83;if(u.status==='maintenance')return 0x7987a2;return 0x668eb7}
 function toast(s){const t=$('toast');t.textContent=s;t.style.display='block';clearTimeout(toast.timer);toast.timer=setTimeout(()=>t.style.display='none',3500)}
-function init3D(){if(!window.THREE)throw Error('3D engine unavailable');scene=new THREE.Scene();scene.background=new THREE.Color(0x0d1d30);camera=new THREE.OrthographicCamera(-65,65,42,-42,.1,1000);renderer=new THREE.WebGLRenderer({antialias:true,powerPreference:'high-performance'});renderer.domElement.addEventListener('webglcontextlost',e=>{e.preventDefault();$('modelStatus').hidden=false;$('modelStatus').textContent='3D graphics context lost. Reload the page to restore the building.'});renderer.setPixelRatio(Math.min(devicePixelRatio,2));$('scene').prepend(renderer.domElement);scene.add(new THREE.HemisphereLight(0xffffff,0x243f56,2));const light=new THREE.DirectionalLight(0xffffff,1);light.position.set(50,100,40);scene.add(light);raycaster=new THREE.Raycaster();mouse=new THREE.Vector2();const ground=new THREE.Mesh(new THREE.PlaneGeometry(200,160),new THREE.MeshLambertMaterial({color:0x304355}));ground.rotation.x=-Math.PI/2;ground.position.y=-1;scene.add(ground);
-// Sketch-traced footprint: left = Toledo Terrace, right = rear parking.
-// Coordinates follow the user's hand-drawn roof outline clockwise.
-// All walls and roof derive from ONE closed polygon, not overlapping wings.
-const outlinePx=[
- [223,76],[308,76],[520,35],[533,64],[534,180],[407,194],
- [407,284],[418,326],[556,326],[558,506],[413,505],
- [413,640],[423,733],[561,739],[565,947],[355,934],
- [357,1060],[371,1182],[586,1190],[611,1310],[248,1310],
- [239,1250],[230,867],[375,868],[375,787],[260,787],
- [235,708],[221,482],[290,464],[369,464],[376,385],
- [232,380],[230,300]
-];
-const footprint=outlinePx.map(([px,py])=>new THREE.Vector2((px-418)*.24,(py-676)*.105));
-const wallHeight=17.3;
-const wallMat=new THREE.MeshStandardMaterial({color:0xb99a82,roughness:.9});
-const brickMat=new THREE.MeshStandardMaterial({color:0x955e50,roughness:.92});
-const creamMat=new THREE.MeshStandardMaterial({color:0xd8cbb9,roughness:.83});
-const roofMat=new THREE.MeshStandardMaterial({color:0xdfe4e0,roughness:.95,side:THREE.DoubleSide});
-const darkMat=new THREE.MeshStandardMaterial({color:0x3b454b,roughness:.65});
-const glazing=new THREE.MeshStandardMaterial({color:0x53788a,roughness:.24,metalness:.12});
-const concrete=new THREE.MeshStandardMaterial({color:0xbcb8b1,roughness:.85});
-const asphalt=new THREE.MeshStandardMaterial({color:0x454a50,roughness:1});
-const greenery=new THREE.MeshStandardMaterial({color:0x476b46,roughness:1,flatShading:true});
-function addBox(w,h,d,x,y,z,mat,rotation=0){const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),mat);m.position.set(x,y,z);m.rotation.y=rotation;scene.add(m);return m}
-const outlineShape=new THREE.Shape();
-footprint.forEach((p,i)=>i?outlineShape.lineTo(p.x,p.y):outlineShape.moveTo(p.x,p.y));
-outlineShape.closePath();
-const shell=new THREE.Mesh(new THREE.ExtrudeGeometry(outlineShape,{depth:wallHeight,bevelEnabled:false,steps:1,curveSegments:1}),[roofMat,wallMat]);
-shell.rotation.x=Math.PI/2;shell.position.y=wallHeight;scene.add(shell);
-const roof=new THREE.Mesh(new THREE.ShapeGeometry(outlineShape),roofMat);
-roof.rotation.x=Math.PI/2;roof.position.y=wallHeight+.035;scene.add(roof);
-// The parapet follows the exact roof outline; avoids floating roof triangles.
-for(let i=0;i<footprint.length;i++){
- const p=footprint[i],q=footprint[(i+1)%footprint.length],dx=q.x-p.x,dz=q.y-p.y;
- const length=Math.hypot(dx,dz);if(length<1)continue;
- const angle=-Math.atan2(dz,dx);
- addBox(length+.12,.68,.48,(p.x+q.x)/2,wallHeight+.28,(p.y+q.y)/2,creamMat,angle);
- // Façade rhythm aligned with each wall segment, no windows across recesses.
- const count=Math.floor(length/3.45);
- if(count<1)continue;
- for(let j=0;j<count;j++){
-  const t=(j+.5)/count,px=p.x+dx*t,pz=p.y+dz*t;
-  const theta=-Math.atan2(dz,dx);
-  // Outward offset (all facades use the same edge-normal convention).
-  const nx=dz/length,nz=-dx/length;
-  const bayMat=(j%5===0||j%5===1)?brickMat:creamMat;
-  addBox(Math.min(3.1,length/count-.18),wallHeight-.8,.16,px+nx*.15,wallHeight/2,pz+nz*.15,bayMat,theta);
-  for(let floor=0;floor<4;floor++){
-   const yy=2.45+floor*4.05;
-   addBox(Math.min(1.85,length/count-.6),2.3,.13,px+nx*.28,yy,pz+nz*.28,glazing,theta);
-   addBox(Math.min(2.12,length/count-.3),.12,.24,px+nx*.32,yy-1.24,pz+nz*.32,concrete,theta);
-  }
-  if(j%4===2&&length>10){
-   for(let floor=1;floor<4;floor++){
-    const yy=floor*4.05+1.05;
-    addBox(2.55,.18,1.65,px+nx*.92,yy-.9,pz+nz*.92,concrete,theta);
-    addBox(2.55,.09,.09,px+nx*1.75,yy+.15,pz+nz*1.75,darkMat,theta);
-    for(const shift of [-1.15,0,1.15]){
-     const tangentX=dx/length,tangentZ=dz/length;
-     addBox(.07,.95,.07,px+tangentX*shift+nx*1.75,yy-.36,pz+tangentZ*shift+nz*1.75,darkMat);
-    }
-   }
-  }
- }
-}
-// Mechanical housings on roof; constrained to broad interior portions.
-for(const [x,z] of [[-20,-46],[-12,-15],[-7,19],[-18,51]]){
- addBox(3.2,1.65,2.9,x,wallHeight+.82,z,creamMat);
- addBox(2.1,.55,1.5,x+4,wallHeight+.35,z+1,darkMat);
-}
-// Street is always left of the footprint, rear parking always right.
-addBox(13,.16,158,-64,-.65,0,asphalt);
-addBox(5,.15,158,-54,-.55,0,concrete);
-addBox(20,.15,158,52,-.65,0,asphalt);
-for(let z=-75;z<77;z+=6){
- addBox(4,.03,.09,50,-.55,z,roofMat);
- if(Math.floor(z/6)%3!==0){
-  addBox(4.2,.8,2.15,58,.1,z,brickMat);
-  addBox(2.15,.48,1.7,58,.74,z,glazing);
- }
-}
-for(let z=-72;z<76;z+=12){
- const trunk=addBox(.38,2.8,.38,-49,1.05,z,brickMat);
- const crown=new THREE.Mesh(new THREE.IcosahedronGeometry(2.2,1),greenery);
- crown.position.set(-49,3.75,z);scene.add(crown);
-}
-// Preserve individual unit selection through invisible raycast targets.
-// Unit positions are schematic, not surveyed apartment locations.
-store.units.forEach((u,i)=>{
- const local=i%71,row=Math.floor(local/18),col=local%18;
- const x=-25+col*2.6,z=-68+row*35,y=(u.floor-1)*4.05+2.3;
- const mesh=addBox(6.9,3.8,6.4,x,y,z,new THREE.MeshBasicMaterial({color:color(u),transparent:true,opacity:0,depthWrite:false}));
- mesh.userData.sel=u.id;meshes.set(u.id,mesh);
-});
-brackets=new THREE.BoxHelper(new THREE.Mesh(new THREE.BoxGeometry(4.6,4.1,8)),0x7dc9ff);brackets.visible=false;scene.add(brackets);
-const viewAngles={front:{a:Math.PI,e:.38,d:190},rear:{a:0,e:.38,d:190},left:{a:2.4,e:.6,d:190},right:{a:-.75,e:.6,d:190},top:{a:Math.PI,e:1.55,d:175}};$('cameraViews').addEventListener('click',event=>{const view=event.target.closest('[data-view]');if(!view)return;Object.assign(orbit,viewAngles[view.dataset.view]);orbit.target={x:0,y:8,z:0};camera.zoom=190/orbit.d;camera.updateProjectionMatrix();});const el=renderer.domElement;el.addEventListener('pointerdown',e=>{drag={x:e.clientX,y:e.clientY,a:orbit.a,e:orbit.e,moved:false};el.setPointerCapture(e.pointerId)});el.addEventListener('pointermove',e=>{if(!drag)return;const dx=e.clientX-drag.x,dy=e.clientY-drag.y;if(Math.abs(dx)+Math.abs(dy)>5)drag.moved=true;orbit.a=drag.a-dx*.007;orbit.e=Math.max(.18,Math.min(1.35,drag.e+dy*.005))});el.addEventListener('pointerup',e=>{if(!drag?.moved)pick(e);drag=null});el.addEventListener('pointercancel',()=>{drag=null});el.addEventListener('wheel',e=>{e.preventDefault();orbit.d=Math.max(45,Math.min(260,orbit.d+e.deltaY*.12));camera.zoom=190/orbit.d;camera.updateProjectionMatrix()},{passive:false});addEventListener('resize',resize);resize();animate();setTimeout(resize,80);}
-function resize(){const w=Math.max(320,$('scene').clientWidth),h=Math.max(360,$('scene').clientHeight);const scale=Math.min(w/175,h/145);camera.left=-w/(2*scale);camera.right=w/(2*scale);camera.top=h/(2*scale);camera.bottom=-h/(2*scale);camera.updateProjectionMatrix();renderer.setSize(w,h)}
-function animate(){requestAnimationFrame(animate);const {a,e,d,target}=orbit;camera.position.set(target.x+Math.cos(a)*Math.cos(e)*d,target.y+Math.sin(e)*d,target.z+Math.sin(a)*Math.cos(e)*d);camera.lookAt(target.x,target.y,target.z);renderer.render(scene,camera)}
-function pick(e){const rect=renderer.domElement.getBoundingClientRect();mouse.set((e.clientX-rect.left)/rect.width*2-1,-(e.clientY-rect.top)/rect.height*2+1);raycaster.setFromCamera(mouse,camera);const hits=raycaster.intersectObjects([...meshes.values()]);if(hits.length)select(hits[0].object.userData.sel)}
-function select(id){if(!unit(id))return;selected=id;const m=meshes.get(id);if(m){orbit.target={x:m.position.x,y:m.position.y,z:m.position.z};brackets.setFromObject(m);brackets.visible=true}render();recolor()}
-function recolor(){store.units.forEach(u=>{const m=meshes.get(u.id);if(m){m.material.color.setHex(color(u));m.material.opacity=selected===u.id?.14:0}})}
 function opts(values,selected){return values.map(v=>'<option '+(v===selected?'selected':'')+'>'+escapeHtml(v)+'</option>').join('')}
 function render(){const occupied=store.units.filter(u=>u.status==='occupied').length;$('today').textContent=TODAY;$('occupancy').textContent=(occupied/283*100).toFixed(1)+'% occupied';const open=store.workOrders.filter(w=>w.status!=='closed');$('openCount').textContent=open.length+' open WOs';$('emergency').textContent=open.filter(w=>w.priority==='emergency').length+' EMERGENCY';$('tabs').innerHTML=tabs.map(t=>'<button class="'+(tab===t?'active':'')+'" data-tab="'+t+'">'+t+'</button>').join('');$('inspector').innerHTML=selected?inspector(unit(selected)):'Select a unit in the 3D building to inspect it.';let out='';
 if(tab==='Work Orders'){out='<div class="row"><h3>Work orders</h3><button data-action="newwo">+ New</button></div><select id="woFilter">'+opts(['All','Open','Emergency'],filter)+'</select>';out+=store.workOrders.filter(w=>filter==='All'||filter==='Open'&&w.status!=='closed'||filter==='Emergency'&&w.priority==='emergency'&&w.status!=='closed').map(w=>'<article><div class="row"><button data-unit="'+w.unitId+'">'+w.id+' · '+w.unitId+'</button><span>'+w.priority+'</span></div><p>'+w.category+' · '+w.created+'</p><select data-wo="'+w.id+'">'+opts(['open','in_progress','closed'],w.status)+'</select></article>').join('')}
@@ -182,8 +80,8 @@ if(tab==='Inspections'){out='<h3>Inspections</h3>'+store.inspections.map(i=>'<ar
 if(tab==='CapEx'){out='<h3>Capital projects</h3>'+store.capexProjects.map(p=>'<article><strong>'+escapeHtml(p.name)+'</strong><p>$'+p.spent.toLocaleString()+' / $'+p.budget.toLocaleString()+'</p><div class="bar"><span style="width:'+Math.min(100,p.spent/p.budget*100)+'%"></span></div><label>Spent ($)<input type="number" min="0" data-cx="'+p.id+'" value="'+p.spent+'"></label></article>').join('')}
 if(tab==='Turns'){out='<h3>Unit turns</h3>'+store.turns.map(t=>'<article><div class="row"><button data-unit="'+t.unitId+'">'+t.unitId+'</button><small>Target '+t.targetReady+'</small></div><p>'+t.vendor+'</p><select data-turn="'+t.id+'">'+opts(['inspect','repairs','paint','clean','ready'],t.stage)+'</select></article>').join('')}
 if(tab==='Leasing'){out='<h3>Leasing · last 14 days</h3><p>'+occupied+' occupied · '+store.units.filter(u=>u.status==='vacant').length+' rent-ready vacant</p>'+store.leasing.filter(l=>l.date>=dateAdd(-13)).sort((a,b)=>b.date.localeCompare(a.date)).map(l=>'<article><button data-unit="'+l.unitId+'">'+l.unitId+'</button> · '+l.type+'<p>'+l.date+' · '+escapeHtml(l.party)+'</p></article>').join('')}
-$('content').innerHTML=out}
-function inspector(u){return '<h3>Unit '+u.id+'</h3><p>Floor '+u.floor+' · '+u.beds+' bed / '+u.baths+' bath · '+u.sqft+' sqft</p><p>Status: '+u.status+' · Lease end: '+(u.leaseEnd||'N/A')+'</p><p>Resident: '+(u.resident||'Demo / not provided')+'</p><p>Open WOs: '+openWO(u.id).map(w=>w.id+' ('+w.priority+')').join(', ')+'</p><p>Inspection: '+(inspectionFlag(u.id)?'FAILED':'No active failure')+'</p><p>Turn: '+(activeTurn(u.id)?.stage||'None')+'</p><button data-action="newwo">+ Work order for this unit</button>'}
+$('content').innerHTML=out;$('unitSelect').innerHTML='<option value="">Select unit…</option>'+store.units.map(u=>'<option value="'+escapeHtml(u.id)+'" '+(u.id===selected?'selected':'')+'>'+escapeHtml(u.id)+' · Floor '+u.floor+' · '+u.status+'</option>').join('')}
+function inspector(u){return '<h3>Unit '+u.id+'</h3><small>Model location is schematic</small><p>Floor '+u.floor+' · '+u.beds+' bed / '+u.baths+' bath · '+u.sqft+' sqft</p><p>Status: '+u.status+' · Lease end: '+(u.leaseEnd||'N/A')+'</p><p>Resident: '+(u.resident||'Demo / not provided')+'</p><p>Open WOs: '+openWO(u.id).map(w=>w.id+' ('+w.priority+')').join(', ')+'</p><p>Inspection: '+(inspectionFlag(u.id)?'FAILED':'No active failure')+'</p><p>Turn: '+(activeTurn(u.id)?.stage||'None')+'</p><button data-action="newwo">+ Work order for this unit</button>'}
 document.addEventListener('click',e=>{const t=e.target.closest('[data-tab],[data-unit],[data-action]');if(!t)return;if(t.dataset.tab){tab=t.dataset.tab;render()}else if(t.dataset.unit)select(t.dataset.unit);else if(t.dataset.action==='newwo'){const id=prompt('Unit ID',selected||'A-101');if(!unit(id))return toast('Unknown unit');const category=prompt('Category: plumbing, electrical, hvac, appliance, general','general');if(!['plumbing','electrical','hvac','appliance','general'].includes(category))return;const priority=prompt('Priority: emergency, high, normal, low','normal');if(!['emergency','high','normal','low'].includes(priority))return;const record={id:'WO-'+Date.now(),unitId:id,category,priority,status:'open',created:TODAY,due:dateAdd(3),assignee:'Unassigned',notes:''};store.workOrders.push(record);save('workOrders',record);select(id);if(priority==='emergency')toast('Emergency work order created: '+id)}});
 document.addEventListener('change',e=>{const t=e.target;if(t.id==='woFilter'){filter=t.value;render();return}if(t.dataset.wo){const w=store.workOrders.find(w=>w.id===t.dataset.wo);w.status=t.value;save('workOrders',w)}if(t.dataset.in){const i=store.inspections.find(x=>x.id===t.dataset.in);i.status=t.value;i.scheduled=TODAY;save('inspections',i);if(t.value==='failed')toast('Inspection failed: '+i.unitId)}if(t.dataset.turn){const x=store.turns.find(x=>x.id===t.dataset.turn);x.stage=t.value;if(t.value==='ready')unit(x.unitId).status='vacant';else unit(x.unitId).status='turn';save('turns',x);save('units',unit(x.unitId))}if(t.dataset.cx){const p=store.capexProjects.find(x=>x.id===t.dataset.cx);p.spent=Math.max(0,Number(t.value)||0);save('capexProjects',p)}});
 async function loadThree(){
@@ -195,8 +93,7 @@ async function loadThree(){
 }
 async function start(){
  const ready=await loadThree();
- if(!ready){$('authError').textContent='3D library could not load. Check your connection and reload.';$('guestBtn').disabled=true;return}
+ if(!ready)$('authError').textContent='Interactive 3D unavailable. Static model views and property operations remain available.';
  try{await initializeAuth()}catch(e){$('authError').textContent='Sign-in unavailable. Continue as guest.'}
 }
-start();
-</script></body></html>
+</script><script src="viewer.js"></script><script>start();</script></body></html>
