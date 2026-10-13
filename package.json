@@ -1,0 +1,13 @@
+{
+  "name": "alterra-ops",
+  "private": true,
+  "scripts": {
+    "test": "node tests/viewer-smoke.cjs",
+    "build": "npm test && node scripts/build.cjs",
+    "model": "node scripts/build-model.cjs"
+  },
+  "devDependencies": {
+    "gltf-validator": "2.0.0-dev.3.10",
+    "three": "0.128.0"
+  }
+}
